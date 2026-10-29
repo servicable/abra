@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ecos del Bosque Eterno</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #05070a; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: #d8d2c4; user-select: none; }
+  #cv { display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    cursor: crosshair; background: #05070a; }
+  .capa { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(8,14,10,.86) 0%, rgba(2,4,6,.97) 100%);
+    z-index: 10; padding: 18px; overflow: auto; }
+  .oculto { display: none !important; }
+  .panel { width: min(940px, 96vw); background: linear-gradient(180deg, #0d1410 0%, #070b09 100%);
+    border: 1px solid #2f4433; border-radius: 6px; padding: 26px 30px;
+    box-shadow: 0 0 60px rgba(0,0,0,.8), inset 0 0 40px rgba(30,60,40,.12); max-height: 94vh; overflow: auto; }
+  h1 { font-size: clamp(28px, 4.6vw, 52px); letter-spacing: 3px; text-align: center;
+    color: #cbb878; text-shadow: 0 0 22px rgba(180,160,80,.35); margin-bottom: 4px; font-weight: normal; }
+  h2 { font-size: 20px; color: #cbb878; letter-spacing: 2px; font-weight: normal; margin-bottom: 10px; }
+  .sub { text-align: center; color: #6f8a72; letter-spacing: 4px; font-size: 12px;
+    text-transform: uppercase; margin-bottom: 18px; }
+  .lore { font-size: 15px; line-height: 1.65; color: #a9b3a5; background: rgba(20,32,24,.55);
+    border-left: 3px solid #3f5c42; padding: 14px 16px; margin: 14px 0; font-style: italic; }
+  .centrado { text-align: center; }
+  .btn { display: inline-block; font-family: inherit; font-size: 15px; letter-spacing: 1px;
+    background: linear-gradient(180deg, #22382a, #14211a); color: #d9e6d5; border: 1px solid #4a6f51;
+    border-radius: 4px; padding: 11px 22px; cursor: pointer; margin: 6px; transition: all .18s; }
+  .btn:hover { background: linear-gradient(180deg, #35543d, #1d2f24); border-color: #7fb086;
+    box-shadow: 0 0 18px rgba(110,180,120,.3); }
+  .btn.peligro { border-color: #7a4040; background: linear-gradient(180deg, #3a2020, #241414); }
+  .btn.peligro:hover { border-color: #c06060; box-shadow: 0 0 18px rgba(200,90,90,.3); }
+  .btn.chico { font-size: 13px; padding: 6px 14px; margin: 3px; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 12px 0; }
+  .stat { background: rgba(18,28,20,.7); border: 1px solid #2b3f2f; border-radius: 4px;
+    padding: 8px 16px; text-align: center; min-width: 110px; }
+  .stat b { display: block; color: #cbb878; font-size: 20px; font-weight: normal; }
+  .stat span { font-size: 11px; color: #7d8f7f; text-transform: uppercase; letter-spacing: 1px; }
+  .controles { font-size: 13px; color: #93a495; line-height: 1.9; background: rgba(10,16,12,.6);
+    border: 1px dashed #33483a; border-radius: 4px; padding: 12px 16px; margin-top: 14px; }
+  .controles b { color: #cbb878; font-weight: normal; }
+  kbd { background: #16211a; border: 1px solid #46604c; border-bottom-width: 2px; border-radius: 3px;
+    padding: 1px 7px; font-family: monospace; font-size: 12px; color: #d9e6d5; }
+  .tarjetas { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+  .tarjeta { flex: 1 1 240px; max-width: 300px; background: linear-gradient(180deg, #121b15, #0a100c);
+    border: 1px solid #33483a; border-radius: 6px; padding: 18px; cursor: pointer; transition: all .2s; }
+  .tarjeta:hover { border-color: #7fb086; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,.6); }
+  .tarjeta h3 { color: #e6dcc0; font-weight: normal; font-size: 18px; letter-spacing: 1px; text-align: center; }
+  .tarjeta .icono { font-size: 42px; text-align: center; margin: 8px 0; }
+  .tarjeta .desc { font-size: 12.5px; color: #93a495; line-height: 1.55; margin-top: 8px; min-height: 60px; }
+  .raridad { display: inline-block; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 10px; border: 1px solid currentColor; margin-bottom: 6px; }
+  .r0 { color: #a8a193; } .r1 { color: #6fbf5f; } .r2 { color: #5fa8e8; }
+  .r3 { color: #b06fe8; } .r4 { color: #e8c05f; }
+  .barrita { height: 7px; background: #0c120e; border: 1px solid #2b3f2f; border-radius: 4px;
+    overflow: hidden; margin-top: 5px; }
+  .barrita i { display: block; height: 100%; background: linear-gradient(90deg, #4e8f5c, #7fd08a); }
+  .fila { display: flex; justify-content: space-between; font-size: 12.5px; color: #93a495; margin-top: 3px; }
+  .pestanas { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid #2b3f2f; }
+  .pestana { padding: 9px 20px; cursor: pointer; color: #7d8f7f; font-size: 14px; letter-spacing: 1px;
+    border: 1px solid transparent; border-bottom: none; border-radius: 5px 5px 0 0; }
+  .pestana.on { color: #cbb878; background: #101a13; border-color: #2b3f2f; }
+  .lista { display: flex; flex-direction: column; gap: 8px; max-height: 46vh; overflow: auto; padding-right: 6px; }
+  .item { display: flex; align-items: center; gap: 12px; background: rgba(18,28,20,.6);
+    border: 1px solid #2b3f2f; border-radius: 4px; padding: 9px 12px; font-size: 13.5px; }
+  .item .ico { font-size: 22px; width: 30px; text-align: center; }
+  .item .n { color: #e6dcc0; }
+  .item .d { color: #7d8f7f; font-size: 12px; }
+  .item .der { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .vacio { text-align: center; color: #5e6f61; font-style: italic; padding: 26px 10px; }
+  .inv-cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .mon { color: #e8c05f; font-size: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 10px; }
+  .ranura { background: rgba(18,28,20,.6); border: 1px dashed #33483a; border-radius: 4px;
+    padding: 10px 12px; font-size: 12.5px; text-align: center; }
+  .ranura .t { color: #6f8a72; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .aviso { background: rgba(60,22,22,.55); border: 1px solid #7a4040; border-radius: 4px;
+    padding: 12px 14px; color: #e8b0b0; font-size: 14px; line-height: 1.6; margin: 12px 0; text-align: center; }
+  .frag { font-size: 13.5px; line-height: 1.7; color: #a9b3a5; border-left: 2px solid #3f5c42;
+    padding: 6px 12px; margin: 8px 0; font-style: italic; background: rgba(16,26,19,.5); }
+  .tit-frag { color: #cbb878; font-size: 12px; letter-spacing: 1px; font-style: normal; }
+  .tienda { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+  .mejora { background: rgba(18,28,20,.7); border: 1px solid #2b3f2f; border-radius: 5px;
+    padding: 12px 14px; text-align: center; min-width: 170px; font-size: 13px; }
+  .mejora .lvl { color: #cbb878; font-size: 12px; letter-spacing: 1px; }
+  .fin { font-size: 15.5px; line-height: 1.8; color: #b9c4b6; text-align: center; margin: 16px 0; }
+  .sep { height: 1px; background: #2b3f2f; margin: 16px 0; }
+  #botonesJuego { position: absolute; display: flex; flex-direction: column; gap: 8px; z-index: 5; }
+  .btnJuego { background: linear-gradient(180deg, rgba(18,30,20,.92), rgba(8,14,10,.92));
+    border: 1px solid #3f5c42; border-radius: 5px; color: #cbb878; font-family: Georgia, serif;
+    font-size: 13px; letter-spacing: 1px; padding: 9px 14px; cursor: pointer; white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(0,0,0,.5); text-align: center; }
+  .btnJuego:hover { border-color: #7fb086; color: #e6dcc0; background: linear-gradient(180deg, rgba(28,46,32,.95), rgba(12,20,14,.95)); }
+  .btnJuego.activo { border-color: #8fd8ff; color: #8fd8ff; }
+  .btnJuego:disabled { opacity: .45; cursor: default; }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="botonesJuego" class="oculto">
+  <button id="btnInvJuego" class="btnJuego" title="Abrir inventario (I)">🎒 Inventario</button>
+  <button id="btnPetJuego" class="btnJuego" title="Invocar o retirar la mascota (E)">🐾 Mascota</button>
+</div>
+
+<div id="capaTitulo" class="capa">
+  <div class="panel">
+    <h1>ECOS DEL BOSQUE ETERNO</h1>
+    <div class="sub">El mundo desaparece a tus espaldas</div>
+    <div class="lore">
+      Los tres guardianes de Eldoria desaparecieron. La tierra se corrompió, los caminos se borraron
+      y el mundo empezó a desvanecerse detrás de quienes caminaban por él.<br><br>
+      Despiertas en medio del bosque sin recordar tu pasado. Detrás de ti, el suelo comienza a
+      desaparecer bajo una niebla negra. Una voz susurra: «No mires atrás. El bosque ya sabe que estás aquí».
+    </div>
+    <div class="stats" id="tituloStats"></div>
+    <div class="centrado">
+      <button class="btn" id="btnAventura">Comenzar la aventura</button>
+      <button class="btn" id="btnControles">Controles</button>
+      <button class="btn" id="btnSonido">Sonido: activado</button>
+    </div>
+    <div id="panelControles" class="controles oculto">
+      <b>Movimiento:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas ·
+      <kbd>Shift</kbd> correr (resistencia)<br>
+      <b>Atacar:</b> clic izquierdo o <kbd>Espacio</kbd> · <b>Habilidad especial:</b> clic derecho o <kbd>Q</kbd><br>
+      <b>Mascotas:</b> <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> seleccionar · <kbd>E</kbd> invocar / retirar<br>
+      <b>Inventario:</b> <kbd>I</kbd> (mascotas, objetos, huevos, historia) · <kbd>Esc</kbd> cerrar · <kbd>M</kbd> silenciar<br>
+      <b>Regla de oro:</b> avanzar es sobrevivir. La niebla nunca deja de avanzar.
+    </div>
+    <div class="sep"></div>
+    <div class="centrado"><h2>Refugio del viajero</h2>
+      <div style="font-size:12.5px;color:#7d8f7f">Gasta monedas entre aventuras para fortalecer tu forma humana</div>
+    </div>
+    <div class="tienda" id="tienda"></div>
+  </div>
+</div>
+
+<div id="capaMascotas" class="capa oculto">
+  <div class="panel">
+    <h2 class="centrado">Elige tu primer compañero</h2>
+    <div class="sub">Al invocarla te convertirás en ella. Si muere, morirá para siempre.</div>
+    <div class="tarjetas" id="listaMascotasInicio"></div>
+    <div class="centrado" style="margin-top:16px">
+      <button class="btn peligro" id="btnSinMascota">Salir sin mascota (solo humano)</button>
+    </div>
+  </div>
+</div>
+
+<div id="capaInventario" class="capa oculto">
+  <div class="panel">
+    <div class="inv-cab">
+      <h2 style="margin:0">Inventario</h2>
+      <div><span class="mon">🪙 <b id="invMonedas">0</b></span>
+      <button class="btn chico" id="btnCerrarInv">Cerrar (Esc)</button></div>
+    </div>
+    <div class="pestanas">
+      <div class="pestana on" data-p="mascotas">Mascotas</div>
+      <div class="pestana" data-p="objetos">Objetos</div>
+      <div class="pestana" data-p="historia">Historia</div>
+    </div>
+    <div id="invCuerpo"></div>
+  </div>
+</div>
+
+<div id="capaFin" class="capa oculto">
+  <div class="panel" style="max-width:640px">
+    <h1 id="finTitulo" style="font-size:34px">Has muerto</h1>
+    <div class="sub" id="finSub"></div>
+    <div class="fin" id="finTexto"></div>
+    <div class="stats" id="finStats"></div>
+    <div class="centrado">
+      <button class="btn" id="btnReintentar">Volver a intentarlo</button>
+      <button class="btn" id="btnMenu">Menú principal</button>
+    </div>
+  </div>
+</div>
+
+<div id="capaFinal" class="capa oculto">
+  <div class="panel" style="max-width:700px">
+    <h1 style="font-size:30px">EL DEVORADOR CAE</h1>
+    <div class="sub">La verdad del bosque</div>
+    <div class="fin" id="finalTexto">
+      La masa oscura se deshace ante ti. Los huevos que llevas brillan con la energía de los antiguos
+      guardianes, y por primera vez la niebla retrocede.<br><br>
+      Pero el mundo espera una decisión. ¿Qué harás con el poder que ha quedado sin dueño?
+    </div>
+    <div class="centrado" id="finalOpciones">
+      <button class="btn" data-fin="0">Destruir al Devorador para siempre</button>
+      <button class="btn" data-fin="1">Restaurar a los tres guardianes</button>
+      <button class="btn peligro" data-fin="2">Tomar su poder y gobernar</button>
+    </div>
+    <div class="fin oculto" id="finalCierre"></div>
+    <div class="centrado oculto" id="finalBtn"><button class="btn" id="btnFinMenu">Volver al inicio</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   ECOS DEL BOSQUE ETERNO — RPG de supervivencia y mascotas
+   Mundo que desaparece · Lobos · Huevos 1% · Botín 50%
+   Invocación (te conviertes en la mascota) · Muerte permanente
+   ============================================================ */
+
+/* ---------- Utilidades ---------- */
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+const rnd = (a, b) => a + Math.random() * (b - a);
+const ri = (a, b) => Math.floor(rnd(a, b + 1));
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+/* mezcla fuerte del índice de trozo: evita que semillas parecidas
+   generen el mismo patrón de enemigos (agrupación de élites) */
+function hashSeed(n) {
+  let h = (n + 0x9E3779B9) | 0;
+  h = Math.imul(h ^ (h >>> 16), 0x21f0aaad);
+  h = Math.imul(h ^ (h >>> 15), 0x735a2d97);
+  h ^= h >>> 15;
+  return h >>> 0;
+}
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/* ---------- Configuración ---------- */
+const CFG = {
+  worldHalf: 1500,
+  chunkH: 1000,
+  viewAhead: 2600,
+  viewBehind: 1500,
+  fogBase: 32,
+  fogGrow: 0.018,
+  fogMax: 100,
+  meterDiv: 12,
+  startY: 100,
+  bossMeters: 1800
+};
+
+const REGIONES = [
+  { n: 'I — El Bosque Despierto', corto: 'Bosque Despierto', desde: 0,    color: '#7fb069' },
+  { n: 'II — El Bosque Corrompido', corto: 'Bosque Corrompido', desde: 350, color: '#b09a4a' },
+  { n: 'III — Las Ruinas de los Guardianes', corto: 'Ruinas', desde: 800, color: '#9a6fc0' },
+  { n: 'IV — El Fin de la Niebla', corto: 'Fin de la Niebla', desde: 1400, color: '#d05f5f' }
+];
+const regionIdx = m => { let r = 0; for (let i = 0; i < REGIONES.length; i++) if (m >= REGIONES[i].desde) r = i; return r; };
+const pathX = y => Math.sin(y * 0.0016) * 420 + Math.sin(y * 0.00043 + 1.7) * 260;
+
+/* ---------- Mascotas ---------- */
+/* especial: dash | stun | nova | heal | phase | shield */
+const PETS = {
+  lobo_plata:   { n: 'Lobo de Plata', form: 'lobo', r: 0, c1: '#e2e8f0', c2: '#93a3b4', hp: 72,  atk: 15, spd: 262, cd: .30, alc: 60,  modo: 'melé',   esp: { t: 'dash',  n: 'Embestida', d: 'Cargas hacia delante hiriendo a todo lo que toca.', cd: 7 } },
+  oso_piedra:   { n: 'Oso de Piedra', form: 'oso', r: 0, c1: '#9c8f7d', c2: '#6b6152', hp: 185, atk: 22, spd: 142, cd: .62, alc: 66,  modo: 'melé',   esp: { t: 'stun',  n: 'Rugido', d: 'Aturde a los enemigos cercanos durante 2,6 s.', cd: 11 } },
+  zorro_arcano: { n: 'Zorro Arcano', form: 'zorro', r: 0, c1: '#e8834a', c2: '#a04f2a', hp: 62,  atk: 19, spd: 205, cd: .55, alc: 430, modo: 'proyectil', esp: { t: 'nova', n: 'Explosión de energía', d: 'Detona un aura que daña y empuja a los enemigos.', cd: 9 } },
+  lobo_umbrio:  { n: 'Lobo Umbrío', form: 'lobo', r: 1, c1: '#4a5568', c2: '#2d3748', hp: 86,  atk: 19, spd: 278, cd: .26, alc: 60,  modo: 'melé',   esp: { t: 'dash',  n: 'Paso sombrío', d: 'Embistida rápida con probabilidad de crítico.', cd: 6 } },
+  oso_musgo:    { n: 'Oso de Musgo', form: 'oso', r: 1, c1: '#6f8f5a', c2: '#47603a', hp: 215, atk: 24, spd: 140, cd: .66, alc: 68,  modo: 'melé',   esp: { t: 'shield', n: 'Fortaleza', d: 'Reduce el daño recibido un 60% durante 4 s.', cd: 12 } },
+  zorro_ceniza: { n: 'Zorro de Ceniza', form: 'zorro', r: 1, c1: '#b0b7c3', c2: '#616a78', hp: 74,  atk: 23, spd: 215, cd: .50, alc: 470, modo: 'proyectil', esp: { t: 'nova', n: 'Espiral de cenizas', d: 'Explosión amplia con retroceso muy alto.', cd: 8 } },
+  ciervo_espiritu: { n: 'Ciervo Espíritu', form: 'ciervo', r: 2, c1: '#cfe8d8', c2: '#7fae94', hp: 130, atk: 21, spd: 252, cd: .45, alc: 420, modo: 'proyectil', esp: { t: 'heal', n: 'Luz restauradora', d: 'Recupera el 35% de tu vida máxima.', cd: 14 } },
+  lobo_espectral: { n: 'Lobo Espectral', form: 'espectro', r: 2, c1: '#a9d7ff', c2: '#5f8fc7', hp: 96,  atk: 27, spd: 270, cd: .34, alc: 62,  modo: 'melé',   esp: { t: 'phase', n: 'Fase espectral', d: 'Te vuelves intangible y atraviesas enemigos y árboles.', cd: 10 } },
+  serpiente_savia: { n: 'Serpiente de Savia', form: 'serpiente', r: 2, c1: '#79c26b', c2: '#3d7a34', hp: 104, atk: 28, spd: 232, cd: .40, alc: 64, modo: 'melé', esp: { t: 'dash', n: 'Mordida relámpago', d: 'Salto perforante con daño crítico garantizado.', cd: 6.5 } },
+  guardian_joven: { n: 'Guardián Joven', form: 'oso', r: 3, c1: '#d8c88a', c2: '#8f7c3a', hp: 265, atk: 31, spd: 156, cd: .60, alc: 70,  modo: 'melé',   esp: { t: 'stun',  n: 'Orden del guardián', d: 'Aturde y daña a todo lo cercano.', cd: 10 } },
+  lobo_crepusculo: { n: 'Lobo del Crepúsculo', form: 'lobo', r: 3, c1: '#f0a860', c2: '#8a4a20', hp: 175, atk: 37, spd: 288, cd: .30, alc: 62, modo: 'melé', esp: { t: 'dash', n: 'Carga crepuscular', d: 'Doble embestida devastadora.', cd: 7 } },
+  espiritu_bosque: { n: 'Espíritu del Bosque', form: 'espiritu', r: 4, c1: '#a8ffcf', c2: '#2f9e6b', hp: 225, atk: 35, spd: 244, cd: .42, alc: 460, modo: 'proyectil', esp: { t: 'nova', n: 'Erupción de raíces', d: 'Anillo masivo de espinas y curación ligera.', cd: 9 } },
+  lobo_ancestral: { n: 'Lobo Ancestral', form: 'lobo', r: 4, c1: '#e9d8a6', c2: '#9a7b2e', hp: 290, atk: 43, spd: 282, cd: .30, alc: 64, modo: 'melé', esp: { t: 'dash', n: 'Embate ancestral', d: 'Carga imparable que arrasa la línea.', cd: 6 } }
+};
+const RAREZAS = ['Común', 'Poco común', 'Raro', 'Épico', 'Legendario'];
+const HUEVOS = {
+  0: ['lobo_plata', 'oso_piedra', 'zorro_arcano'],
+  1: ['lobo_umbrio', 'oso_musgo', 'zorro_ceniza'],
+  2: ['ciervo_espiritu', 'lobo_espectral', 'serpiente_savia'],
+  3: ['guardian_joven', 'lobo_crepusculo'],
+  4: ['espiritu_bosque', 'lobo_ancestral']
+};
+const ICONO_PET = { lobo: '🐺', oso: '🐻', zorro: '🦊', ciervo: '🦌', serpiente: '🐍', espectro: '👻', espiritu: '🌿' };
+const ICONO_HUEVO = ['🥚', '🥚', '🔵', '🟣', '✨'];
+
+/* ---------- Enemigos ---------- */
+const ENEMIGOS = {
+  lobo:      { n: 'Lobo del bosque', form: 'lobo', c1: '#8a8f98', c2: '#5c6169', hp: 46,  atk: 10, spd: 148, def: 2, alc: 54, cd: 1.15, aggro: 360, esc: 1 },
+  corrupto:  { n: 'Lobo corrompido', form: 'lobo', c1: '#7a5aa0', c2: '#43305e', hp: 96,  atk: 17, spd: 164, def: 5, alc: 58, cd: 1.05, aggro: 440, esc: 1.12, carga: true },
+  espectral: { n: 'Lobo espectral', form: 'espectro', c1: '#9fd4ff', c2: '#4d78b0', hp: 76, atk: 21, spd: 208, def: 2, alc: 56, cd: .92, aggro: 540, esc: 1.05, fase: true },
+  guardian:  { n: 'Guardián corrompido', form: 'guardian', c1: '#b58ad8', c2: '#5a2f7a', hp: 245, atk: 20, spd: 152, def: 8, alc: 90, cd: 1.3, aggro: 620, esc: 1.7, elite: true, carga: true },
+  devorador: { n: 'El Devorador', form: 'devorador', c1: '#2a1030', c2: '#000000', hp: 1750, atk: 30, spd: 118, def: 12, alc: 150, cd: 1.6, aggro: 2400, esc: 3.4, jefe: true }
+};
+
+/* ---------- Equipamiento ---------- */
+const GEAR_NOMBRES = {
+  weapon: ['Daga de corteza', 'Espada musgosa', 'Hoja de savia', 'Filo espectral', 'Mandoble del guardián'],
+  armor:  ['Túnica de hojas', 'Coraza de corteza', 'Peto petrificado', 'Égida de niebla', 'Placas del guardián'],
+  amulet: ['Amuleto de raíz', 'Talismán de niebla', 'Sello espectral', 'Gema del devorador', 'Corazón del bosque']
+};
+const GEAR_TIPO = { weapon: 'Arma', armor: 'Armadura', amulet: 'Amuleto' };
+
+/* ---------- Fragmentos de la historia ---------- */
+const FRAGMENTOS = [
+  { t: 'Diario de la exploradora Selene', x: '«El camino no termina: se borra. Caminamos sobre un mundo que se escribe mientras avanzamos y se borra mientras dormimos.»' },
+  { t: 'Estela del Espíritu de la Vida', x: '«Tres hermanos sostienen la tierra: la vida, las bestias y la oscuridad. Cuando uno falta, los otros dos se pudren.»' },
+  { t: 'Piedra de los cazadores', x: '«Los lobos no nos atacan: nos huelen. Huelen la niebla que llevamos encima desde que cruzamos el umbral.»' },
+  { t: 'Fragmento de un salmo antiguo', x: '«No hay huevo que no contenga un eco. Por eso la niebla teme a las cáscaras: dentro guardan un pedazo de lo que éramos.»' },
+  { t: 'Memorial de la aldea de Brumavil', x: '«Aquellos que mueren en el bosque no desaparecen del todo: algo vuelve a la raíz. Por eso el suelo bebe tan a menudo.»' },
+  { t: 'Escritura en la puerta de las Ruinas', x: '«El Devorador no quiere destruir el mundo. Quiere reescribirlo con su propia voz.»' },
+  { t: 'Última página del guardián Aldric', x: '«Ya no distinguimos al bestiario de la corrupción. Matamos lobos y lloramos por ellos al caer.»' },
+  { t: 'Oráculo bajo la niebla', x: '«Quien invoca a una bestia presta su cuerpo. Quien la pierde, devuelve al bosque un fragmento de luz.»' },
+  { t: 'Tablilla de los tres guardianes', x: '«La Vida dio los huevos, las Bestias dieron el vínculo, la Oscuridad dio el precio. Nada se invoca gratis.»' },
+  { t: 'Confesión de un cazador', x: '«Conté mis monedas mil veces. Ninguna valió lo que valió el lobo que caminó a mi lado y ya no camina.»' },
+  { t: 'Grabado en la raíz del mundo', x: '«Detrás de la niebla no hay nada borrado: hay un lugar esperando a ser el único.»' },
+  { t: 'Profecía del Fin de la Niebla', x: '«Cuando el caminante alcance el borde del mundo, el que devora bajará la cabeza. Y ahí se decidirá si el bosque respira o calla.»' }
+];
+const CIERRES = [
+  'La oscuridad se rompe como vidrio viejo. La niebla se detiene, los árboles dejan de pudrirse y el sendero se extiende hasta el horizonte. El mundo seguirá imperfecto, pero ya no se borrará. Los ecos de los guardianes descansan, y tú, caminante, por fin puedes volver a mirar atrás.',
+  'Las raíces beben el poder liberado y el bosque renace en un estallido de hojas verdes. Los tres guardianes despiertan lentamente, y el primero que te mira reconoce en ti a quien sostuvo el mundo mientras ellos dormían. Eldoria vuelve a temblar, pero esta vez con vida.',
+  'Te coronas con la sombra del Devorador. La niebla obedece a tu voz y el mundo se detiene a tu alrededor como un perro fiel. Desde ese día, nadie camina por el bosque sin pasar antes por ti. Y tú, que empezaste huyendo, aprendiste que el que come la oscuridad termina por habitarla.'
+];
+
+/* ---------- Guardado persistente (permadeath real) ---------- */
+const SAVE_KEY = 'ecos_bosque_eterno_v1';
+let save = {
+  coins: 0, pets: [], eggs: [], gear: [],
+  equipped: { weapon: null, armor: null, amulet: null },
+  upgrades: { hp: 0, atk: 0, spd: 0 },
+  best: 0, runs: 0, kills: 0, lost: 0, lostNames: [], fragments: [], muted: false
+};
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) { const d = JSON.parse(raw); if (d && typeof d === 'object') save = Object.assign(save, d); }
+  } catch (e) { }
+  /* ---- Sanitizar partidas guardadas antiguas o corruptas ----
+     Quita cualquier dato que el juego actual no entienda (p. ej. mascotas
+     con un id que ya no existe) para que nada rompa las pantallas. */
+  if (!save.equipped || typeof save.equipped !== 'object') save.equipped = { weapon: null, armor: null, amulet: null };
+  if (!save.upgrades || typeof save.upgrades !== 'object') save.upgrades = { hp: 0, atk: 0, spd: 0 };
+  ['hp', 'atk', 'spd'].forEach(k => { save.upgrades[k] = Math.max(0, Math.min(5, save.upgrades[k] | 0)); });
+  if (!Array.isArray(save.pets)) save.pets = [];
+  save.pets = save.pets.filter(p => p && typeof p === 'object' && typeof p.uid === 'string' && PETS[p.id]);
+  if (!Array.isArray(save.eggs)) save.eggs = [];
+  save.eggs = save.eggs.filter(e => e && typeof e === 'object' && HUEVOS[e.rar] !== undefined);
+  if (!Array.isArray(save.gear)) save.gear = [];
+  save.gear = save.gear.filter(g => g && typeof g === 'object' && g.st && typeof g.st === 'object' &&
+    (g.slot === 'weapon' || g.slot === 'armor' || g.slot === 'amulet'));
+  ['weapon', 'armor', 'amulet'].forEach(k => {
+    const g = save.equipped[k];
+    if (g && (typeof g !== 'object' || !g.st)) save.equipped[k] = null;
+  });
+  if (!Array.isArray(save.fragments)) save.fragments = [];
+  if (!Array.isArray(save.lostNames)) save.lostNames = [];
+  if (typeof save.muted !== 'boolean') save.muted = false;
+  ['coins', 'best', 'runs', 'kills', 'lost'].forEach(k => {
+    if (typeof save[k] !== 'number' || !isFinite(save[k]) || save[k] < 0) save[k] = 0;
+  });
+  persist(); // guarda ya saneado
+}
+function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { } }
+let uidSeq = 1;
+function nuevoUid() { return 'p' + (Date.now().toString(36)) + (uidSeq++); }
+
+/* ---------- Estado global ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W = 0, H = 0;
+const S = {
+  estado: 'titulo', t: 0, last: 0,
+  keys: {}, mouse: { x: 0, y: 0, down: false, rdown: false },
+  chunks: new Map(), enemies: [], proys: [], pickups: [], efectos: [], flotantes: [],
+  notif: [], kills: 0, region: 0, avisoRegion: 0, boss: null, bossSpawneado: false,
+  fogY: -400, cam: { x: 0, y: 0 },
+  invocPend: 0, invocAvisoT: 0, banner: null, pausa: false
+};
+let P = null; // jugador / forma activa
+
+/* ---------- Audio ---------- */
+let AC = null;
+function snd(freq, dur = .08, tipo = 'square', vol = .05, slide = 0) {
+  if (save.muted) return;
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = tipo; o.frequency.setValueAtTime(freq, AC.currentTime);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), AC.currentTime + dur);
+    g.gain.setValueAtTime(vol, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, AC.currentTime + dur);
+    o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + dur);
+  } catch (e) { }
+}
+const sfx = {
+  golpe: () => snd(rnd(150, 200), .07, 'sawtooth', .05, -60),
+  matar: () => { snd(120, .18, 'square', .06, -70); snd(70, .3, 'sine', .05, -30); },
+  herido: () => snd(95, .16, 'square', .06, -50),
+  botin: () => { snd(620, .07, 'sine', .05); setTimeout(() => snd(880, .1, 'sine', .05), 70); },
+  huevo: () => { [520, 660, 790, 1040].forEach((f, i) => setTimeout(() => snd(f, .14, 'triangle', .06), i * 90)); },
+  invocar: () => { snd(220, .3, 'sine', .06, 320); setTimeout(() => snd(440, .25, 'triangle', .05, 200), 120); },
+  morirMascota: () => { [300, 220, 150, 90].forEach((f, i) => setTimeout(() => snd(f, .3, 'sawtooth', .06, -40), i * 130)); },
+  region: () => { [330, 440, 550, 660].forEach((f, i) => setTimeout(() => snd(f, .2, 'triangle', .05), i * 110)); },
+  roco: () => snd(60, .5, 'sawtooth', .07, -20),
+  curar: () => { snd(500, .12, 'sine', .05, 150); setTimeout(() => snd(750, .16, 'sine', .05, 150), 90); }
+};
+
+/* ---------- Utilidades de mundo ---------- */
+const dist2 = (ax, ay, bx, by) => { const dx = ax - bx, dy = ay - by; return dx * dx + dy * dy; };
+const metros = y => Math.max(0, Math.floor((y - CFG.startY) / CFG.meterDiv));
+function bloqueadoresCerca(x, y, r) {
+  const out = [];
+  const ci = Math.floor(y / CFG.chunkH);
+  for (let c = ci - 1; c <= ci + 1; c++) {
+    const ch = S.chunks.get(c); if (!ch) continue;
+    for (const o of ch.objetos) {
+      if (!o.block) continue;
+      if (Math.abs(o.y - y) > 400) continue;
+      const rr = o.r + r;
+      if (dist2(x, y, o.x, o.y) < rr * rr) out.push(o);
+    }
+  }
+  return out;
+}
+function empujar(x, y, r) {
+  for (const o of bloqueadoresCerca(x, y, r)) {
+    const dx = x - o.x, dy = y - o.y, d = Math.hypot(dx, dy) || .001, rr = o.r + r;
+    if (d < rr) { const p = (rr - d) / d; x += dx * p; y += dy * p; }
+  }
+  return { x, y };
+}
+
+/* ---------- Generación por trozos ---------- */
+function mk(tipo, x, y, extra) {
+  const base = { tipo, x, y, t: rnd(0, 10) };
+  if (tipo === 'tree') Object.assign(base, { block: true, r: 26, s: rnd(.85, 1.25) });
+  else if (tipo === 'wallTree') Object.assign(base, { block: false, r: 40, s: rnd(1, 1.6) });
+  else if (tipo === 'rock') Object.assign(base, { block: true, r: 20, s: rnd(.8, 1.3) });
+  else if (tipo === 'bush') Object.assign(base, { block: false, r: 10, s: rnd(.8, 1.3) });
+  else if (tipo === 'grass') Object.assign(base, { block: false, r: 4, s: rnd(.7, 1.5) });
+  else if (tipo === 'ruina') Object.assign(base, { block: true, r: 16, s: rnd(.9, 1.3) });
+  else if (tipo === 'chest') Object.assign(base, { block: false, r: 16, abierto: false });
+  else if (tipo === 'altar') Object.assign(base, { block: false, r: 16, usado: false });
+  else if (tipo === 'fuego') Object.assign(base, { block: false, r: 14, usado: false });
+  if (extra) Object.assign(base, extra);
+  return base;
+}
+function pesoEnemigo(reg) {
+  const w = [
+    { tipo: 'lobo', p: 100 },
+    { tipo: 'corrupto', p: reg >= 1 ? 42 + reg * 4 : 0 },
+    { tipo: 'espectral', p: reg >= 2 ? 22 + reg * 6 : 0 }
+  ].filter(o => o.p > 0);
+  let total = 0; w.forEach(o => total += o.p);
+  let r = Math.random() * total;
+  for (const o of w) { r -= o.p; if (r <= 0) return o.tipo; }
+  return 'lobo';
+}
+function crearEnemigo(tipo, x, y, reg, ci) {
+  const d = ENEMIGOS[tipo];
+  const esJefe = tipo === 'devorador';
+  const escHp = esJefe ? 1.5 : 1 + reg * .55;
+  const escAtk = esJefe ? 1.35 : 1 + reg * .45;
+  return {
+    id: tipo, x, y, vx: 0, vy: 0, r: 22 * d.esc,
+    hp: Math.round(d.hp * escHp), maxHp: Math.round(d.hp * escHp),
+    atk: Math.round(d.atk * escAtk), spd: d.spd, def: d.def, alc: d.alc, cdMax: d.cd,
+    cd: rnd(0, 1), aggro: d.aggro, esc: d.esc, carga: !!d.carga, fase: !!d.fase,
+    elite: !!d.elite, jefe: !!d.jefe, estado: 'idle', tt: 0, dirAng: rnd(0, TAU),
+    heridoT: 0, aturdido: 0, faseCd: rnd(2, 4), cargaCd: rnd(3, 5), golpeado: {},
+    wander: rnd(0, TAU), ci, muerto: false, invuln: 0, llamadoCd: 5, slamCd: 4
+  };
+}
+function genChunk(ci) {
+  const R = mulberry32(hashSeed(ci));
+  const y0 = ci * CFG.chunkH;
+  const obj = [];
+  const reg = regionIdx(y0 / CFG.meterDiv);
+  const px0 = pathX(y0 + CFG.chunkH / 2);
+  const n = 46 + Math.floor(R() * 26);
+  for (let i = 0; i < n; i++) {
+    const y = y0 + R() * CFG.chunkH;
+    const px = pathX(y);
+    // el 65% del contenido se concentra en la franja que el jugador recorre
+    const x = R() < .65 ? (R() * 2 - 1) * 860 : (R() * 2 - 1) * CFG.worldHalf * 1.2;
+    if (Math.abs(x - px) < 155) continue;
+    const rr = R();
+    if (Math.abs(x) > CFG.worldHalf - 40) obj.push(mk('tree', x, y));
+    else if (rr < .40) obj.push(mk('tree', x, y));
+    else if (rr < .58) obj.push(mk('rock', x, y));
+    else if (rr < .78) obj.push(mk('bush', x, y));
+    else if (rr < .90 && reg >= 1) obj.push(mk('ruina', x, y));
+    else obj.push(mk('grass', x, y));
+  }
+  // muro denso de árboles en los bordes
+  for (let y = y0; y < y0 + CFG.chunkH; y += 66) {
+    obj.push(mk('wallTree', -CFG.worldHalf - 100 - R() * 80, y + R() * 40));
+    obj.push(mk('wallTree', CFG.worldHalf + 100 + R() * 80, y + R() * 40));
+  }
+  // cofres
+  if (R() < .30) {
+    const lado = R() < .5 ? -1 : 1;
+    obj.push(mk('chest', clamp(pathX(y0 + R() * CFG.chunkH) + lado * (180 + R() * 320), -CFG.worldHalf + 60, CFG.worldHalf - 60), y0 + R() * CFG.chunkH));
+  }
+  // altares con fragmentos de la historia
+  if (R() < .36) {
+    obj.push(mk('altar', clamp(pathX(y0 + R() * CFG.chunkH) - (160 + R() * 300), -CFG.worldHalf + 80, CFG.worldHalf - 80), y0 + R() * CFG.chunkH));
+  }
+  // hogueras de descanso
+  if (R() < .13) {
+    obj.push(mk('fuego', clamp(pathX(y0 + R() * CFG.chunkH) + rnd(-90, 90), -CFG.worldHalf + 60, CFG.worldHalf - 60), y0 + R() * CFG.chunkH));
+  }
+  // enemigos
+  const enemigos = [];
+  let cuenta = 2 + reg * 2 + Math.floor(R() * 3);
+  if (ci === 0) cuenta = 3;
+  let guardianes = 0;
+  const maxGuardianes = reg >= 2 ? 2 : 1;
+  for (let i = 0; i < cuenta; i++) {
+    const x = clamp((R() * 2 - 1) * CFG.worldHalf * .92, -CFG.worldHalf + 60, CFG.worldHalf - 60);
+    const y = y0 + R() * CFG.chunkH;
+    if (dist2(x, y, 0, CFG.startY) < 750 * 750) continue;
+    let tipo = pesoEnemigo(reg);
+    if (reg >= 1 && guardianes < maxGuardianes && R() < .10) { tipo = 'guardian'; guardianes++; }
+    enemigos.push(crearEnemigo(tipo, x, y, reg, ci));
+  }
+  return { objetos: obj, enemigos, reg };
+}
+function asegurarChunks() {
+  const cB = Math.floor((P.y - CFG.viewBehind) / CFG.chunkH);
+  const cA = Math.floor((P.y + CFG.viewAhead) / CFG.chunkH);
+  for (let ci = cB; ci <= cA; ci++) {
+    if (!S.chunks.has(ci)) {
+      const ch = genChunk(ci);
+      S.chunks.set(ci, ch);
+      ch.enemigos.forEach(e => S.enemies.push(e));
+    }
+  }
+  const minCi = Math.floor((S.fogY - 800) / CFG.chunkH);
+  for (const ci of Array.from(S.chunks.keys())) {
+    if (ci < minCi) {
+      const ch = S.chunks.get(ci);
+      S.enemies = S.enemies.filter(e => e.ci !== ci || e.jefe);
+      S.chunks.delete(ci);
+    }
+  }
+}
+
+/* ---------- Botín: 1% huevo, 50% equipo o moneda ---------- */
+function pesoHuevo(reg) {
+  const w = [
+    { r: 0, p: [82, 48, 28, 14][reg] || 14 },
+    { r: 1, p: [16, 34, 34, 26][reg] || 26 },
+    { r: 2, p: [2, 15, 25, 34][reg] || 34 },
+    { r: 3, p: [0.01, 3, 11, 20][reg] || 20 },
+    { r: 4, p: [0, 0.01, 2, 6][reg] || 6 }
+  ];
+  let total = 0; w.forEach(o => total += o.p);
+  let r = Math.random() * total;
+  for (const o of w) { r -= o.p; if (r <= 0) return o.r; }
+  return 0;
+}
+function soltarBotin(x, y, reg, escala) {
+  // 1% huevo (cálculo independiente)
+  if (Math.random() < 0.01) {
+    const rar = pesoHuevo(reg);
+    S.pickups.push({ tipo: 'huevo', x: x + rnd(-20, 20), y: y + rnd(-20, 20), vx: rnd(-60, 60), vy: rnd(60, 140), t: 0, rar });
+    notif('¡HUEVO RARO! (' + RAREZAS[rar] + ')', '#e8c05f');
+    sfx.huevo();
+  }
+  // 50% equipo o moneda
+  if (Math.random() < 0.5) {
+    if (Math.random() < .58) {
+      const cantidad = Math.round(rnd(6, 22) * (1 + reg * .8) * (escala || 1));
+      S.pickups.push({ tipo: 'moneda', x: x + rnd(-26, 26), y: y + rnd(-26, 26), vx: rnd(-70, 70), vy: rnd(70, 150), t: 0, cant: cantidad });
+    } else {
+      const slots = ['weapon', 'armor', 'amulet'];
+      const slot = pick(slots);
+      const rar = clamp(Math.floor(Math.random() * (1.6 + reg * 1.1)), 0, 4);
+      S.pickups.push({ tipo: 'equipo', x: x + rnd(-20, 20), y: y + rnd(-20, 20), vx: rnd(-60, 60), vy: rnd(60, 140), t: 0, slot, rar });
+    }
+  }
+}
+function crearEquipo(slot, rar) {
+  const nombre = GEAR_NOMBRES[slot][rar];
+  const st = {};
+  if (slot === 'weapon') { st.atk = 3 + rar * 4 + ri(0, 2); }
+  if (slot === 'armor') { st.hp = 14 + rar * 16; st.def = 1 + rar; }
+  if (slot === 'amulet') { st.spd = 9 + rar * 7; st.atk = 1 + rar * 2; }
+  return { uid: 'g' + Date.now().toString(36) + ri(10, 99), slot, rar, nombre, st };
+}
+function puntuacion(g) {
+  const s = g.st;
+  return (s.atk || 0) * 3 + (s.hp || 0) * .5 + (s.def || 0) * 4 + (s.spd || 0) * .35;
+}
+function describirEquipo(g) {
+  const p = [];
+  if (g.st.atk) p.push('+' + g.st.atk + ' ataque');
+  if (g.st.hp) p.push('+' + g.st.hp + ' vida');
+  if (g.st.def) p.push('+' + g.st.def + ' defensa');
+  if (g.st.spd) p.push('+' + g.st.spd + ' velocidad');
+  return p.join(' · ');
+}
+function notif(txt, color) {
+  S.notif.push({ txt, color: color || '#d9e6d5', t: 0 });
+  if (S.notif.length > 6) S.notif.shift();
+}
+function flotante(x, y, txt, color, grande) {
+  S.flotantes.push({ x, y, vy: 44, txt, color: color || '#fff', t: 0, grande: !!grande });
+}
+function efecto(tipo, x, y, opt) {
+  S.efectos.push(Object.assign({ tipo, x, y, t: 0 }, opt || {}));
+}
+
+/* ---------- Estadísticas ---------- */
+function bonusObjetos() {
+  const b = { hp: 0, atk: 0, spd: 0, def: 0 };
+  for (const k of ['weapon', 'armor', 'amulet']) {
+    const g = save.equipped[k]; if (!g) continue;
+    b.hp += g.st.hp || 0; b.atk += g.st.atk || 0; b.spd += g.st.spd || 0; b.def += g.st.def || 0;
+  }
+  return b;
+}
+function statsHumanos() {
+  const u = save.upgrades, b = bonusObjetos();
+  return { maxHp: 100 + 15 * u.hp + b.hp, atk: 12 + 2 * u.atk + b.atk, spd: 200 + 8 * u.spd + b.spd, def: b.def, cd: .44, alc: 62 };
+}
+function statsMascota(pet) {
+  const d = PETS[pet.id] || PETS.lobo_plata, b = bonusObjetos();
+  return {
+    maxHp: d.hp + Math.round(b.hp * .6), atk: d.atk + b.atk, spd: d.spd + b.spd,
+    def: b.def, cd: d.cd, alc: d.alc, esc: 1
+  };
+}
+const petDe = uid => save.pets.find(p => p.uid === uid);
+const petVivas = () => save.pets.filter(p => petDe(p.uid));
+
+/* ---------- Estado de la partida ---------- */
+let petHp = {};        // uid -> vida durante la partida
+let selUid = null;     // mascota seleccionada en la barra 1-2-3
+let invocUid = null;   // mascota invocada (null = forma humana)
+
+function nuevaPartida() {
+  save.runs++;
+  petHp = {};
+  save.pets.forEach(p => { petHp[p.uid] = statsMascota(p).maxHp; });
+  const vivas = save.pets.slice(0, 3);
+  selUid = vivas.length ? vivas[0].uid : null;
+  invocUid = null;
+  const h = statsHumanos();
+  P = {
+    x: 0, y: CFG.startY, r: 18, hp: h.maxHp, maxHp: h.maxHp,
+    atk: h.atk, spd: h.spd, def: h.def, cd: h.cd, alc: h.alc,
+    atkCd: 0, espCd: 0, facing: 1, ang: Math.PI / 2, stamina: 100, stamLock: 0,
+    dashT: 0, dashAng: 0, dashHit: null, invuln: 0, shield: 0, fase: 0,
+    humHpAntes: h.maxHp, rec: 0, pasos: 0, golpeFlash: 0
+  };
+  S.chunks.clear(); S.enemies = []; S.proys = []; S.pickups = []; S.efectos = []; S.flotantes = [];
+  S.notif = []; S.kills = 0; S.region = 0; S.avisoRegion = 0; S.boss = null; S.bossSpawneado = false;
+  S.fogY = -400; S.cam = { x: 0, y: CFG.startY + 150 }; S.invocPend = 0; S.pausa = false;
+  S.perdidasIni = save.lost;
+  S.lectura = null;
+  asegurarChunks();
+  S.estado = 'jugando';
+  banner(REGIONES[0].n, 'La niebla empieza a avanzar detrás de ti');
+  notif('Avanza. No mires atrás.', '#8fae90');
+}
+function statsActivas() {
+  if (invocUid) {
+    const pet = petDe(invocUid);
+    if (!pet) { invocUid = null; return statsHumanos(); }
+    return statsMascota(pet);
+  }
+  return statsHumanos();
+}
+function nombreForma() {
+  if (invocUid) { const p = petDe(invocUid); if (p) return PETS[p.id].n; }
+  return 'Viajero';
+}
+function iconoForma() {
+  if (invocUid) { const p = petDe(invocUid); if (p) return ICONO_PET[PETS[p.id].form] || '🐾'; }
+  return '🧝';
+}
+function vidaForma() {
+  if (invocUid && petHp[invocUid] !== undefined) return petHp[invocUid];
+  return P.hp;
+}
+function ponerVidaForma(v) {
+  if (invocUid && petHp[invocUid] !== undefined) petHp[invocUid] = v;
+  else P.hp = v;
+}
+function banner(titulo, sub) { S.banner = { t: titulo, s: sub || '', t0: 0 }; }
+
+/* ---------- Invocación y muerte permanente ---------- */
+function pedirInvocar() {
+  if (!selUid) { notif('No tienes ninguna mascota seleccionada', '#c08080'); return; }
+  const pet = petDe(selUid); if (!pet) return;
+  if (invocUid === selUid) { retirarMascota(); return; }
+  const hp = petHp[selUid] || 0, mx = statsMascota(pet).maxHp;
+  const cercano = S.enemies.some(e => !e.muerto && dist2(e.x, e.y, P.x, P.y) < 420 * 420);
+  if (hp / mx < .5 || cercano) {
+    S.invocPend = selUid; S.invocAvisoT = 4;
+    snd(180, .2, 'square', .05, -60);
+    return;
+  }
+  invocar(selUid);
+}
+function invocar(uid) {
+  const pet = petDe(uid); if (!pet) return;
+  const hpHum = P.hp;
+  invocUid = uid; selUid = uid;
+  P.humHpAntes = Math.max(hpHum, statsHumanos().maxHp * .55);
+  const s = statsActivas();
+  P.atk = s.atk; P.spd = s.spd; P.def = s.def; P.cd = s.cd; P.alc = s.alc;
+  P.r = 18; P.atkCd = 0; P.espCd = 0; P.dashT = 0; P.fase = 0;
+  efecto('anillo', P.x, P.y, { dur: .6, color: '#8fd8ff', r: 120 });
+  sfx.invocar();
+  notif('Te conviertes en ' + PETS[pet.id].n, '#8fd8ff');
+}
+function retirarMascota() {
+  if (!invocUid) return;
+  const pet = petDe(invocUid);
+  invocUid = null;
+  const h = statsHumanos();
+  P.hp = Math.max(P.humHpAntes, h.maxHp * .5);
+  P.maxHp = h.maxHp; P.atk = h.atk; P.spd = h.spd; P.def = h.def; P.cd = h.cd; P.alc = h.alc;
+  P.dashT = 0; P.fase = 0; P.shield = 0;
+  efecto('anillo', P.x, P.y, { dur: .5, color: '#cbb878', r: 90 });
+  snd(320, .2, 'sine', .05, -140);
+  if (pet) notif('Vuelves a tu cuerpo (' + pet.n + ' descansa)', '#cbb878');
+}
+function muerteMascota() {
+  const uid = invocUid; if (!uid) return;
+  const pet = petDe(uid); if (!pet) return;
+  const nombre = PETS[pet.id].n;
+  // PERMADETH: fuera de la colección para siempre
+  save.pets = save.pets.filter(p => p.uid !== uid);
+  delete petHp[uid];
+  save.lost++;
+  save.lostNames.push(nombre);
+  if (save.lostNames.length > 12) save.lostNames.shift();
+  invocUid = null; if (selUid === uid) selUid = save.pets.length ? save.pets[0].uid : null;
+  const h = statsHumanos();
+  P.hp = Math.max(1, h.maxHp * .45); P.maxHp = h.maxHp;
+  P.atk = h.atk; P.spd = h.spd; P.def = h.def; P.cd = h.cd; P.alc = h.alc;
+  P.dashT = 0; P.fase = 0; P.shield = 0; P.invuln = 1.4;
+  efecto('anillo', P.x, P.y, { dur: 1, color: '#ff5a5a', r: 160 });
+  sfx.morirMascota();
+  banner('EL VÍNCULO SE HA ROTO', nombre + ' ha muerto para siempre');
+  persist();
+}
+function sanarForma(cant) {
+  const mx = statsActivas().maxHp;
+  ponerVidaForma(Math.min(mx, vidaForma() + cant));
+}
+
+/* ---------- Daño ---------- */
+function danarEnemigo(e, dmg, crit) {
+  if (e.muerto || e.invuln > 0) return;
+  const real = Math.max(1, Math.round(dmg - e.def * .5));
+  e.hp -= real; e.heridoT = .18;
+  flotante(e.x, e.y - 10 * e.esc, (crit ? '★ ' : '') + real, crit ? '#ffd76a' : '#ff9a7a', crit);
+  sfx.golpe();
+  if (e.hp <= 0) matarEnemigo(e);
+}
+function matarEnemigo(e) {
+  if (e.muerto) return;
+  e.muerto = true; S.kills++;
+  efecto('sangre', e.x, e.y, { dur: .5, r: 26 * e.esc, color: e.jefe ? '#b060d0' : '#8a2b2b' });
+  sfx.matar();
+  const reg = regionIdx(metros(e.y));
+  soltarBotin(e.x, e.y, reg, e.elite ? 3 : (e.jefe ? 8 : 1));
+  if (e.elite) { notif('¡Guardián corrompido abatido!', '#b06fe8'); flotante(e.x, e.y, 'ÉLITE', '#b06fe8', true); }
+  if (e.jefe) { victoria(); return; }
+  // el bosque recibe un eco de cada muerte
+  if (Math.random() < .12) efecto('eco', e.x, e.y, { dur: 2.5 });
+}
+function danarJugador(dmg) {
+  if (P.invuln > 0 || P.fase > 0) return;
+  let real = dmg * (P.shield > 0 ? .4 : 1);
+  real = Math.max(1, Math.round(real - P.def * .5));
+  if (invocUid) {
+    petHp[invocUid] -= real;
+    flotante(P.x, P.y - 26, '-' + real, '#ff6a6a');
+    sfx.herido();
+    if (petHp[invocUid] <= 0) { petHp[invocUid] = 0; muerteMascota(); }
+  } else {
+    P.hp -= real;
+    flotante(P.x, P.y - 26, '-' + real, '#ff6a6a');
+    sfx.herido();
+    if (P.hp <= 0) { P.hp = 0; morir(); }
+  }
+  P.golpeFlash = .25;
+}
+function morir() {
+  S.estado = 'fin';
+  save.best = Math.max(save.best, S.metaRecorrida || 0);
+  persist();
+  mostrarFin(false);
+}
+
+/* ---------- Ataques del jugador ---------- */
+function atacar() {
+  if (P.atkCd > 0 || P.dashT > 0) return;
+  P.atkCd = P.cd;
+  const ang = P.ang;
+  if (invocUid) {
+    const pet = petDe(invocUid); const d = PETS[pet.id];
+    if (d.modo === 'proyectil') {
+      S.proys.push({
+        x: P.x + Math.cos(ang) * 22, y: P.y + Math.sin(ang) * 22,
+        vx: Math.cos(ang) * 560, vy: Math.sin(ang) * 560,
+        dmg: P.atk, life: 1.1, friendly: true, color: d.c1, r: 9, pierce: d.r >= 1, hit: new Set()
+      });
+      snd(520, .07, 'triangle', .04, 200);
+    } else melee(ang, P.alc, P.atk, 110);
+  } else {
+    melee(ang, P.alc, P.atk, 100);
+  }
+  efecto('slash', P.x + Math.cos(ang) * 26, P.y + Math.sin(ang) * 26, { ang, dur: .22, r: P.alc });
+}
+function melee(ang, alc, dmg, arco) {
+  let toco = false;
+  for (const e of S.enemies) {
+    if (e.muerto) continue;
+    const dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy);
+    if (d > alc + e.r) continue;
+    const a = Math.atan2(dy, dx);
+    let diff = Math.abs(((a - ang + Math.PI * 3) % TAU) - Math.PI);
+    if (diff < arco * Math.PI / 360) {
+      const crit = Math.random() < .12;
+      danarEnemigo(e, dmg * rnd(.9, 1.1) * (crit ? 1.8 : 1), crit);
+      const k = e.jefe ? 40 : 150;
+      e.x += Math.cos(a) * k * .05; e.y += Math.sin(a) * k * .05;
+      toco = true;
+    }
+  }
+  if (toco) efecto('impacto', P.x + Math.cos(ang) * alc * .7, P.y + Math.sin(ang) * alc * .7, { dur: .2 });
+}
+function habilidad() {
+  if (P.espCd > 0 || !invocUid || P.dashT > 0) return;
+  const pet = petDe(invocUid); if (!pet) return;
+  const d = PETS[pet.id], esp = d.esp;
+  P.espCd = esp.cd;
+  const ang = P.ang;
+  if (esp.t === 'dash') {
+    P.dashT = .26; P.dashAng = ang; P.dashHit = new Set(); P.dashDmg = P.atk * 1.7;
+    P.fase = 0;
+    snd(240, .18, 'sawtooth', .05, 320);
+  } else if (esp.t === 'stun') {
+    efecto('anillo', P.x, P.y, { dur: .7, color: '#ffd76a', r: 260 });
+    snd(90, .4, 'square', .06, -30);
+    for (const e of S.enemies) {
+      if (e.muerto) continue;
+      if (dist2(e.x, e.y, P.x, P.y) < 260 * 260) {
+        e.aturdido = 2.6;
+        danarEnemigo(e, P.atk * .8);
+        flotante(e.x, e.y - 20, 'ATURDIDO', '#ffd76a');
+      }
+    }
+  } else if (esp.t === 'nova') {
+    const R = d.r >= 3 ? 240 : 200;
+    efecto('nova', P.x, P.y, { dur: .55, color: d.c1, r: R });
+    snd(160, .3, 'sine', .06, 400);
+    for (const e of S.enemies) {
+      if (e.muerto) continue;
+      const dd = dist2(e.x, e.y, P.x, P.y);
+      if (dd < R * R) {
+        danarEnemigo(e, P.atk * 2.1);
+        const a = Math.atan2(e.y - P.y, e.x - P.x);
+        const em = e.jefe ? .06 : .3;
+        e.x += Math.cos(a) * em * 100; e.y += Math.sin(a) * em * 100;
+      }
+    }
+    if (d.id === 'espiritu_bosque') sanarForma(18);
+  } else if (esp.t === 'heal') {
+    const cur = statsActivas().maxHp * .35;
+    sanarForma(cur);
+    efecto('anillo', P.x, P.y, { dur: .9, color: '#7fffa8', r: 110 });
+    flotante(P.x, P.y - 30, '+' + Math.round(cur), '#7fffa8', true);
+    sfx.curar();
+  } else if (esp.t === 'phase') {
+    P.fase = 1.1; P.invuln = Math.max(P.invuln, 1.1);
+    P.dashT = .3; P.dashAng = ang; P.dashHit = new Set(); P.dashDmg = P.atk * 1.3;
+    efecto('fantasma', P.x, P.y, { dur: .8, color: d.c1 });
+    snd(700, .3, 'sine', .05, -400);
+  } else if (esp.t === 'shield') {
+    P.shield = 4;
+    efecto('anillo', P.x, P.y, { dur: .8, color: '#9fd8ff', r: 70 });
+    flotante(P.x, P.y - 30, 'FORTALEZA', '#9fd8ff');
+    snd(300, .3, 'triangle', .05, 120);
+  }
+  notif(esp.n + ' — ' + Math.round(esp.cd) + 's de recarga', d.c1);
+}
+
+/* ---------- Actualización ---------- */
+function actualizar(dt) {
+  if (S.estado !== 'jugando' || S.pausa) return;
+
+  const mov = { x: 0, y: 0 };
+  if (S.keys['w'] || S.keys['arrowup']) mov.y += 1;
+  if (S.keys['s'] || S.keys['arrowdown']) mov.y -= 1;
+  if (S.keys['a'] || S.keys['arrowleft']) mov.x -= 1;
+  if (S.keys['d'] || S.keys['arrowright']) mov.x += 1;
+  const largo = Math.hypot(mov.x, mov.y);
+  const corriendo = (S.keys['shift']) && P.stamina > 0 && largo > 0;
+  if (corriendo) { P.stamina = Math.max(0, P.stamina - 26 * dt); P.stamLock = .7; }
+  else if (P.stamLock > 0) P.stamLock -= dt;
+  else P.stamina = Math.min(100, P.stamina + 19 * dt);
+
+  let vx = 0, vy = 0;
+  if (P.dashT > 0) {
+    P.dashT -= dt;
+    const vel = P.fase > 0 ? 720 : 900;
+    vx = Math.cos(P.dashAng) * vel; vy = Math.sin(P.dashAng) * vel;
+    for (const e of S.enemies) {
+      if (e.muerto || P.dashHit.has(e)) continue;
+      if (dist2(e.x, e.y, P.x, P.y) < (e.r + 34) * (e.r + 34)) {
+        P.dashHit.add(e);
+        danarEnemigo(e, P.dashDmg * rnd(.95, 1.2), true);
+      }
+    }
+  } else if (largo > 0) {
+    const s = P.spd * (corriendo ? 1.45 : 1) * (P.fase > 0 ? 1.5 : 1);
+    vx = mov.x / largo * s; vy = mov.y / largo * s;
+    P.pasos += dt * (corriendo ? 11 : 7);
+  }
+  if (P.fase > 0) {
+    P.fase -= dt;
+    if (Math.random() < .5) efecto('fantasma', P.x + rnd(-8, 8), P.y + rnd(-8, 8), { dur: .5, color: '#a9d7ff' });
+  }
+  let nx = P.x + vx * dt, ny = P.y + vy * dt;
+  if (P.dashT <= 0 || P.fase <= 0) { const p = empujar(nx, ny, P.r); nx = p.x; ny = p.y; }
+  P.x = clamp(nx, -CFG.worldHalf + 30, CFG.worldHalf - 30);
+  P.y = ny;
+
+  if (largo > 0) { P.facing = mov.x !== 0 ? Math.sign(mov.x) : P.facing; }
+  // apuntado con el ratón
+  const mW = { x: S.cam.x + (S.mouse.x - W / 2), y: S.cam.y - (S.mouse.y - H / 2) };
+  if (S.mouse.x || S.mouse.y) P.ang = Math.atan2(mW.y - P.y, mW.x - P.x);
+
+  if (P.atkCd > 0) P.atkCd -= dt;
+  if (P.espCd > 0) P.espCd -= dt;
+  if (P.invuln > 0) P.invuln -= dt;
+  if (P.shield > 0) P.shield -= dt;
+  if (P.golpeFlash > 0) P.golpeFlash -= dt;
+  if (S.mouse.down || S.keys[' '] || S.keys['j']) atacar();
+  if (S.mouse.rdown || S.keys['q']) habilidad();
+
+  // aviso de invocación
+  if (S.invocPend) {
+    S.invocAvisoT -= dt;
+    if (S.invocAvisoT <= 0) S.invocPend = 0;
+  }
+
+  asegurarChunks();
+  actualizarObjetos(dt);
+  actualizarEnemigos(dt);
+  actualizarProys(dt);
+  actualizarPickups(dt);
+  actualizarEfectos(dt);
+
+  // NIEBLA: avanza siempre
+  const mts = metros(P.y);
+  const velFog = Math.min(CFG.fogMax, CFG.fogBase + mts * CFG.fogGrow);
+  S.fogY += velFog * dt;
+  S.metaRecorrida = mts;
+  if (P.y < S.fogY + 30) {
+    ponerVidaForma(vidaForma() - 17 * dt);
+    if (vidaForma() <= 0) { ponerVidaForma(0); if (invocUid) muerteMascota(); else morir(); }
+    if (Math.random() < .3) efecto('niebla', P.x + rnd(-30, 30), P.y + rnd(-20, 20), { dur: 1.2 });
+    if (Math.random() < .06) notif('¡La niebla te alcanza! ¡Corre!', '#b06fe8');
+  }
+  // recuperación leve fuera de combate
+  const enCombate = S.enemies.some(e => !e.muerto && dist2(e.x, e.y, P.x, P.y) < 520 * 520);
+  if (!enCombate && vidaForma() < statsActivas().maxHp) {
+    P.rec += dt;
+    if (P.rec > 3) ponerVidaForma(Math.min(statsActivas().maxHp, vidaForma() + 4 * dt));
+  } else P.rec = 0;
+
+  // región
+  const reg = regionIdx(mts);
+  if (reg !== S.region) {
+    S.region = reg;
+    banner(REGIONES[reg].n, reg >= 2 ? 'Los guardianes caídos resuenan entre las ruinas' : 'El bosque se vuelve más hostil');
+    sfx.region(); notif('Región ' + REGIONES[reg].n, REGIONES[reg].color);
+  }
+  // jefe final
+  if (!S.bossSpawneado && mts >= CFG.bossMeters) {
+    S.bossSpawneado = true;
+    const b = crearEnemigo('devorador', P.x, P.y + 760, 3, 9999);
+    S.enemies.push(b); S.boss = b;
+    banner('EL DEVORADOR SE MANIFIESTA', 'Detrás de ti ya no queda mundo');
+    sfx.roco();
+  }
+  if (S.banner) { S.banner.t0 += dt; if (S.banner.t0 > 3.4) S.banner = null; }
+}
+
+function actualizarEnemigos(dt) {
+  for (const e of S.enemies) {
+    if (e.muerto) continue;
+    if (e.y < S.fogY - 500) { e.muerto = true; continue; }
+    e.cd -= dt; e.heridoT -= dt; e.faseCd -= dt; e.cargaCd -= dt;
+    if (e.invuln > 0) e.invuln -= dt;
+    if (e.aturdido > 0) { e.aturdido -= dt; continue; }
+    const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy) || .001;
+    const lejos = d > e.aggro;
+
+    if (e.estado === 'carga') {
+      e.tt -= dt;
+      e.x += e.cvx * dt; e.y += e.cvy * dt;
+      if (d < e.r + P.r + 6 && !e.golpeado) { e.golpeado = true; danarJugador(e.atk * 1.3); }
+      if (e.tt <= 0) { e.estado = 'recuperar'; e.tt = .5; }
+      const p = empujar(e.x, e.y, e.r * .7); e.x = p.x; e.y = p.y;
+      continue;
+    }
+    if (e.estado === 'fase') {
+      e.tt -= dt;
+      e.x += e.cvx * dt; e.y += e.cvy * dt;
+      if (d < e.r + P.r + 8 && !e.golpeado) { e.golpeado = true; danarJugador(e.atk); }
+      if (e.tt <= 0) { e.estado = 'recuperar'; e.tt = .4; e.invuln = 0; }
+      continue;
+    }
+    if (e.estado === 'recuperar') { e.tt -= dt; if (e.tt <= 0) e.estado = 'perseguir'; continue; }
+    if (e.estado === 'mordisco') {
+      e.tt -= dt;
+      if (e.tt <= 0) {
+        if (d < e.alc + P.r + 12) danarJugador(e.atk);
+        e.estado = 'perseguir'; e.cd = e.cdMax;
+        efecto('mordisco', e.x + dx / d * e.r, e.y + dy / d * e.r, { dur: .2, ang: Math.atan2(dy, dx) });
+      }
+      continue;
+    }
+
+    if (lejos) {
+      // deambular
+      e.wander += rnd(-1, 1) * dt;
+      e.x += Math.cos(e.wander) * 26 * dt;
+      e.y += Math.sin(e.wander) * 26 * dt;
+      const p = empujar(e.x, e.y, e.r * .7); e.x = p.x; e.y = p.y;
+      continue;
+    }
+    // perseguir
+    const ang = Math.atan2(dy, dx);
+    // habilidades especiales
+    if (e.carga && e.cargaCd <= 0 && d > 150 && d < 430 && e.jefe === false) {
+      e.estado = 'carga'; e.tt = .55; e.golpeado = false;
+      e.cvx = Math.cos(ang) * 520; e.cvy = Math.sin(ang) * 520;
+      e.cargaCd = rnd(4.5, 7); efecto('anillo', e.x, e.y, { dur: .5, color: '#c07aff', r: 60 });
+      continue;
+    }
+    if (e.fase && e.faseCd <= 0) {
+      e.estado = 'fase'; e.tt = .75; e.golpeado = false;
+      e.cvx = Math.cos(ang) * 470; e.cvy = Math.sin(ang) * 470;
+      e.invuln = .8; e.faseCd = rnd(3.5, 5.5);
+      efecto('fantasma', e.x, e.y, { dur: .7, color: e.c1 });
+      continue;
+    }
+    if (e.jefe) {
+      e.llamadoCd -= dt; e.slamCd -= dt;
+      if (e.llamadoCd <= 0) {
+        e.llamadoCd = 6.5;
+        for (let i = 0; i < 2; i++) {
+          const w = crearEnemigo('lobo', e.x + rnd(-160, 160), e.y + rnd(-160, 160), 3, e.ci);
+          S.enemies.push(w);
+        }
+        flotante(e.x, e.y - 60, '¡INVOCA LOBOS!', '#b06fe8', true);
+        efecto('anillo', e.x, e.y, { dur: .8, color: '#b06fe8', r: 220 });
+      }
+      if (e.slamCd <= 0 && d < 340) {
+        e.slamCd = 5;
+        efecto('slam', P.x, P.y, { dur: .9, color: '#b06fe8', r: 190 });
+        setTimeout(() => {
+          if (!e.muerto && S.estado === 'jugando' && dist2(e.x, e.y, P.x, P.y) < 420 * 420) danarJugador(e.atk * 1.4);
+        }, 750);
+        snd(70, .5, 'sawtooth', .07, -30);
+      }
+    }
+    if (d < e.alc + P.r && e.cd <= 0) {
+      e.estado = 'mordisco'; e.tt = .32;
+      continue;
+    }
+    const vel = e.spd * (e.estado === 'perseguir' ? 1 : 1);
+    let mx = dx / d * vel * dt, my = dy / d * vel * dt;
+    // separación entre enemigos
+    for (const o of S.enemies) {
+      if (o === e || o.muerto) continue;
+      const ox = e.x - o.x, oy = e.y - o.y, od = Math.hypot(ox, oy);
+      const min = e.r + o.r;
+      if (od > 0 && od < min) { mx += ox / od * 60 * dt; my += oy / od * 60 * dt; }
+    }
+    const p = empujar(e.x + mx, e.y + my, e.r * .75);
+    e.x = clamp(p.x, -CFG.worldHalf - 120, CFG.worldHalf + 120);
+    e.y = p.y;
+  }
+  S.enemies = S.enemies.filter(e => !e.muerto);
+  if (S.boss && S.boss.muerto) S.boss = null;
+}
+function actualizarProys(dt) {
+  for (const p of S.proys) {
+    p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+    if (p.friendly) {
+      for (const e of S.enemies) {
+        if (e.muerto || p.hit.has(e)) continue;
+        if (dist2(e.x, e.y, p.x, p.y) < (e.r + p.r) * (e.r + p.r)) {
+          p.hit.add(e);
+          danarEnemigo(e, p.dmg * rnd(.9, 1.1));
+          efecto('impacto', p.x, p.y, { dur: .2, color: p.color });
+          if (!p.pierce) { p.life = 0; break; }
+        }
+      }
+    }
+    for (const o of bloqueadoresCerca(p.x, p.y, 4)) {
+      if (dist2(o.x, o.y, p.x, p.y) < (o.r + p.r) * (o.r + p.r)) { p.life = 0; break; }
+    }
+    if (p.life <= 0) efecto('impacto', p.x, p.y, { dur: .2, color: p.color || '#fff' });
+  }
+  S.proys = S.proys.filter(p => p.life > 0);
+}
+function actualizarPickups(dt) {
+  for (const it of S.pickups) {
+    it.t += dt;
+    it.x += (it.vx || 0) * dt; it.y += (it.vy || 0) * dt;
+    it.vx = (it.vx || 0) * Math.pow(.02, dt); it.vy = (it.vy || 0) * Math.pow(.02, dt);
+    const d = Math.hypot(P.x - it.x, P.y - it.y);
+    if (d < 110) { it.x = lerp(it.x, P.x, 6 * dt); it.y = lerp(it.y, P.y, 6 * dt); }
+    if (d < 30) recoger(it);
+  }
+  S.pickups = S.pickups.filter(it => !it.recogido);
+}
+function recoger(it) {
+  if (it.recogido) return;
+  it.recogido = true;
+  if (it.tipo === 'moneda') {
+    save.coins += it.cant;
+    flotante(P.x, P.y - 30, '+' + it.cant + ' 🪙', '#e8c05f');
+    snd(760, .06, 'sine', .04, 200);
+  } else if (it.tipo === 'huevo') {
+    save.eggs.push({ uid: 'e' + Date.now().toString(36) + ri(10, 99), rar: it.rar });
+    flotante(P.x, P.y - 34, '¡HUEVO!', RAREZAS[it.rar] === 'Legendario' ? '#e8c05f' : '#8fd8ff', true);
+    notif('Huevo ' + RAREZAS[it.rar] + ' guardado en el inventario', '#8fd8ff');
+  } else if (it.tipo === 'equipo') {
+    const g = crearEquipo(it.slot, it.rar);
+    const actual = save.equipped[it.slot];
+    if (!actual) {
+      save.equipped[it.slot] = g;
+      notif('Equipado: ' + g.nombre + ' (' + RAREZAS[g.rar] + ')', '#cbb878');
+      flotante(P.x, P.y - 34, 'EQUIPADO', '#cbb878');
+    } else if (puntuacion(g) > puntuacion(actual)) {
+      save.gear.push(actual); save.equipped[it.slot] = g;
+      notif('Mejora: ' + g.nombre + ' reemplaza a ' + actual.nombre, '#7fd08a');
+      flotante(P.x, P.y - 34, '¡MEJORA!', '#7fd08a', true);
+    } else {
+      save.gear.push(g);
+      notif('Recogido: ' + g.nombre + ' (' + RAREZAS[g.rar] + ')', '#a9b3a5');
+    }
+    sfx.botin();
+  }
+  aplicarStatsForma();
+  persist();
+}
+function aplicarStatsForma() {
+  if (!P) return;
+  const s = statsActivas();
+  const frac = vidaForma() / Math.max(1, s.maxHp);
+  if (invocUid) { P.atk = s.atk; P.spd = s.spd; P.def = s.def; P.cd = s.cd; P.alc = s.alc; }
+  else {
+    P.maxHp = s.maxHp; P.atk = s.atk; P.spd = s.spd; P.def = s.def; P.cd = s.cd; P.alc = s.alc;
+    P.hp = Math.min(s.maxHp, Math.max(1, Math.round(s.maxHp * frac)));
+  }
+}
+function actualizarEfectos(dt) {
+  for (const f of S.efectos) f.t += dt;
+  S.efectos = S.efectos.filter(f => f.t < (f.dur || .5));
+  for (const f of S.flotantes) { f.t += dt; f.y += f.vy * dt; f.vy *= Math.pow(.35, dt); }
+  S.flotantes = S.flotantes.filter(f => f.t < 1.4);
+  for (const n of S.notif) n.t += dt;
+  S.notif = S.notif.filter(n => n.t < 4);
+}
+
+/* ============================================================
+   RENDERIZADO
+   ============================================================ */
+const w2sx = x => Math.round(W / 2 + (x - S.cam.x));
+const w2sy = y => Math.round(H / 2 - (y - S.cam.y));
+function sombra(x, y, rx, ry, a) {
+  ctx.fillStyle = 'rgba(0,0,0,' + (a || .3) + ')';
+  ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, TAU); ctx.fill();
+}
+function ell(x, y, rx, ry, rot) { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot || 0, 0, TAU); ctx.fill(); }
+function cir(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); }
+function lne(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+
+/* ---------- Criaturas ---------- */
+function dibujarCriatura(form, x, y, esc, c1, c2, t, paso, flip, opt) {
+  opt = opt || {};
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(esc * (flip < 0 ? -1 : 1), esc);
+  const ph = Math.sin(paso) * 4;
+  const br = Math.sin(t * 3) * .6;
+  const patas = (ox, largo) => {
+    ctx.strokeStyle = c2; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    lne(ox - 6, 2, ox - 6 + ph * .7, largo);
+    lne(ox + 6, 2, ox + 6 - ph * .7, largo);
+  };
+
+  if (form === 'lobo' || form === 'guardian') {
+    const gordo = form === 'guardian';
+    patas(-8, 15); patas(9, 15);
+    ctx.strokeStyle = c1; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(-15, -5);
+    ctx.quadraticCurveTo(-27, -12 + Math.sin(t * 6) * 4, -33, -3); ctx.stroke();
+    ctx.fillStyle = c1; ell(0, -3, gordo ? 20 : 17, gordo ? 11 : 9);
+    ctx.fillStyle = shade(c1, -14); ell(-4, -6, gordo ? 17 : 14, 6);
+    ctx.fillStyle = c1; cir(16 + br, -9, gordo ? 11 : 9.5);
+    ctx.fillStyle = c2;
+    ctx.beginPath(); ctx.moveTo(11, -15); ctx.lineTo(13, -26); ctx.lineTo(19, -16); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(19, -16); ctx.lineTo(24, -25); ctx.lineTo(26, -13); ctx.fill();
+    ctx.fillStyle = c1; ell(25 + br, -7, 7, 4.5);
+    ctx.fillStyle = '#111'; cir(27 + br, -7, 1.4);
+    ctx.fillStyle = opt.ojo || (form === 'guardian' ? '#ff5ad0' : '#ffd76a');
+    cir(18 + br, -11, 2.1);
+    if (form === 'guardian') {
+      ctx.fillStyle = '#ff5ad0'; cir(13, -12, 1.6); cir(21, -9, 1.4);
+      ctx.globalAlpha = .35; ctx.fillStyle = '#c07aff'; ell(0, -4, 30, 18); ctx.globalAlpha = 1;
+    }
+    patas(4, 15);
+  } else if (form === 'oso') {
+    patas(-9, 16); patas(10, 16);
+    ctx.strokeStyle = c2; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-16, -6); ctx.lineTo(-22, -2 + ph * .3); ctx.stroke();
+    ctx.fillStyle = c1; ell(0, -5, 21, 13);
+    ctx.fillStyle = shade(c1, -16); ell(-3, -10, 17, 6);
+    ctx.fillStyle = c1; cir(17 + br, -12, 11);
+    ctx.fillStyle = c2; cir(11, -21, 4.5); cir(23, -21, 4.5);
+    ctx.fillStyle = c1; ell(27 + br, -9, 7, 5);
+    ctx.fillStyle = '#111'; cir(29 + br, -10, 1.5); cir(19, -14, 2);
+    patas(5, 16);
+  } else if (form === 'zorro') {
+    patas(-7, 14); patas(8, 14);
+    ctx.strokeStyle = c1; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(-13, -5);
+    ctx.quadraticCurveTo(-26, -14 + Math.sin(t * 7) * 4, -34, -8); ctx.stroke();
+    ctx.strokeStyle = c2; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(-30, -11); ctx.quadraticCurveTo(-34, -9, -34, -8); ctx.stroke();
+    ctx.fillStyle = c1; ell(0, -4, 15, 8);
+    ctx.fillStyle = c1; cir(14 + br, -9, 8.5);
+    ctx.fillStyle = c2;
+    ctx.beginPath(); ctx.moveTo(9, -14); ctx.lineTo(11, -25); ctx.lineTo(17, -15); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(17, -15); ctx.lineTo(22, -24); ctx.lineTo(23, -12); ctx.fill();
+    ctx.fillStyle = c1; ell(23 + br, -7, 7, 4);
+    ctx.fillStyle = '#111'; cir(25 + br, -7, 1.3);
+    ctx.fillStyle = opt.ojo || '#8fffc0'; cir(16 + br, -11, 2);
+    patas(3, 14);
+  } else if (form === 'ciervo') {
+    ctx.strokeStyle = c2; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+    lne(-8, 2, -8 + ph, 17); lne(8, 2, 8 - ph, 17);
+    ctx.strokeStyle = c1; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-13, -6); ctx.lineTo(-17, -2); ctx.stroke();
+    ctx.fillStyle = c1; ell(0, -6, 16, 8.5);
+    ctx.fillStyle = c1; ell(13 + br, -16, 7, 9, -.3);
+    ctx.strokeStyle = '#e8e0c0'; ctx.lineWidth = 2.5;
+    lne(11, -24, 7, -34); lne(11, -24, 15, -33); lne(8, -30, 4, -36); lne(14, -30, 18, -36);
+    ctx.fillStyle = '#111'; cir(17 + br, -18, 1.6);
+    ctx.fillStyle = opt.ojo || '#a8ffd8'; cir(15 + br, -19, 1.8);
+    ctx.strokeStyle = c2; ctx.lineWidth = 3.5;
+    lne(-6, 2, -6 + ph, 17); lne(6, 2, 6 - ph, 17);
+  } else if (form === 'serpiente') {
+    ctx.fillStyle = c2;
+    for (let i = 7; i >= 1; i--) {
+      const wob = Math.sin(paso * 1.4 - i * .7) * 5;
+      cir(-i * 7, wob * .5 - 4, 7 - i * .45);
+    }
+    ctx.fillStyle = c1; cir(4, -6, 9);
+    ctx.fillStyle = '#111'; cir(8, -8, 1.7);
+    ctx.fillStyle = opt.ojo || '#e8ff7a'; cir(7, -9, 2);
+    ctx.strokeStyle = '#ff6a6a'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(12, -5); ctx.lineTo(19, -3 + Math.sin(t * 14) * 2); ctx.stroke();
+    ctx.fillStyle = c1; ell(-1, -12, 7, 3, -.4);
+  } else if (form === 'espectro') {
+    ctx.globalAlpha = opt.alpha || .85;
+    ctx.fillStyle = c1;
+    ctx.beginPath();
+    ctx.moveTo(0, -30); ctx.quadraticCurveTo(16, -18, 13, 4);
+    for (let i = 0; i < 5; i++) ctx.quadraticCurveTo(10 - i * 5, 10 + Math.sin(t * 6 + i) * 4, 6 - i * 5, 3);
+    ctx.quadraticCurveTo(-14, -6, -13, -18); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = shade(c1, -30); cir(0, -26, 10);
+    ctx.fillStyle = opt.ojo || '#0a1a2a';
+    cir(4, -27, 2.4); cir(-3, -27, 2.4);
+    ctx.fillStyle = '#9fd8ff'; cir(4, -27, 1.3); cir(-3, -27, 1.3);
+    ctx.globalAlpha = 1;
+  } else if (form === 'espiritu') {
+    ctx.globalAlpha = .92;
+    const g = ctx.createRadialGradient(0, -14, 4, 0, -14, 34);
+    g.addColorStop(0, c1); g.addColorStop(1, 'rgba(60,220,150,0)');
+    ctx.fillStyle = g; cir(0, -14, 34);
+    ctx.fillStyle = c2;
+    ctx.beginPath();
+    ctx.moveTo(0, -34); ctx.quadraticCurveTo(17, -16, 12, 10);
+    ctx.quadraticCurveTo(4, 16 + Math.sin(t * 5) * 3, 0, 8);
+    ctx.quadraticCurveTo(-4, 16 + Math.cos(t * 5) * 3, -12, 10);
+    ctx.quadraticCurveTo(-17, -16, 0, -34); ctx.fill();
+    ctx.fillStyle = c1; cir(0, -26, 9);
+    ctx.fillStyle = '#08301c'; cir(4, -27, 2.2); cir(-4, -27, 2.2);
+    for (let i = 0; i < 3; i++) {
+      const a = t * 2 + i * TAU / 3;
+      ctx.fillStyle = c1; cir(Math.cos(a) * 24, -14 + Math.sin(a) * 16, 2.6);
+    }
+    ctx.globalAlpha = 1;
+  } else if (form === 'devorador') {
+    const pulso = 1 + Math.sin(t * 4) * .06;
+    ctx.save(); ctx.scale(pulso, pulso);
+    const g = ctx.createRadialGradient(0, -14, 8, 0, -14, 78);
+    g.addColorStop(0, '#4a1458'); g.addColorStop(.55, '#1b0722'); g.addColorStop(1, 'rgba(10,2,14,0)');
+    ctx.fillStyle = g; cir(0, -14, 78);
+    ctx.fillStyle = '#12041a';
+    for (let i = 0; i < 7; i++) {
+      const a = t * .8 + i * TAU / 7;
+      ctx.beginPath();
+      ctx.moveTo(0, -14);
+      ctx.quadraticCurveTo(Math.cos(a) * 50, -14 + Math.sin(a) * 44, Math.cos(a) * 74, -14 + Math.sin(a) * 66);
+      ctx.lineWidth = 7; ctx.strokeStyle = '#12041a'; ctx.stroke();
+    }
+    ctx.fillStyle = '#1a0822'; ell(0, -14, 44, 38);
+    const ojos = [[-22, -30], [0, -40], [22, -30], [-30, -8], [30, -8], [-12, -14], [14, -14]];
+    ojos.forEach((o, i) => {
+      ctx.fillStyle = '#f0e6ff'; ell(o[0], o[1], 7, 6);
+      ctx.fillStyle = '#b06fe8'; cir(o[0] + Math.sin(t * 2 + i) * 2, o[1], 3.4);
+    });
+    ctx.fillStyle = '#000'; ell(0, 6, 22, 9);
+    ctx.fillStyle = '#e6d0ff';
+    for (let i = -3; i <= 3; i++) { ctx.beginPath(); ctx.moveTo(i * 6 - 3, 2); ctx.lineTo(i * 6, 13); ctx.lineTo(i * 6 + 3, 2); ctx.fill(); }
+    ctx.restore();
+  } else if (form === 'humano') {
+    ctx.strokeStyle = '#3a3226'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    lne(-5, 4, -5 + ph * .6, 16); lne(5, 4, 5 - ph * .6, 16);
+    ctx.fillStyle = '#4c5a4a';
+    ctx.beginPath(); ctx.moveTo(0, -28); ctx.quadraticCurveTo(15, -10, 12, 8);
+    ctx.lineTo(-12, 8); ctx.quadraticCurveTo(-15, -10, 0, -28); ctx.fill();
+    ctx.fillStyle = '#6b7a63'; ell(0, -8, 11, 12);
+    ctx.fillStyle = '#2e3830'; cir(0, -30, 9);
+    ctx.fillStyle = '#d9c9a8'; ell(2, -27, 6, 5);
+    ctx.fillStyle = '#2e3830';
+    ctx.beginPath(); ctx.moveTo(-9, -32); ctx.quadraticCurveTo(0, -44, 9, -32); ctx.quadraticCurveTo(0, -36, -9, -32); ctx.fill();
+    ctx.fillStyle = '#1c1a16'; cir(4, -28, 1.4);
+    ctx.strokeStyle = '#c8cdd4'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(9, -6); ctx.lineTo(19, -16); ctx.stroke();
+    ctx.strokeStyle = '#6b5a3a'; ctx.lineWidth = 3.5;
+    lne(8, -4, 11, -8);
+  } else { // por defecto: lobo
+    cir(0, -6, 12);
+  }
+  ctx.restore();
+}
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = clamp((n >> 16) + amt, 0, 255), g = clamp((n >> 8 & 255) + amt, 0, 255), b = clamp((n & 255) + amt, 0, 255);
+  return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+
+/* ---------- Terreno ---------- */
+function dibujarSuelo() {
+  const reg = S.region;
+  const base = ['#2c3d2b', '#33391f', '#2b2733', '#33222a'][reg] || '#2c3d2b';
+  ctx.fillStyle = base; ctx.fillRect(0, 0, W, H);
+  // sendero serpenteante
+  ctx.save();
+  ctx.strokeStyle = 'rgba(88,72,52,.85)';
+  ctx.lineWidth = 168; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  const y0 = S.cam.y - 900, y1 = S.cam.y + 1400;
+  for (let wy = y0; wy <= y1; wy += 46) {
+    const sx = w2sx(pathX(wy)), sy = w2sy(wy);
+    if (wy === y0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(60,48,34,.5)'; ctx.lineWidth = 190;
+  ctx.stroke();
+  ctx.restore();
+  // manchas de tierra
+  const R = mulberry32(Math.floor(S.cam.y / 400) * 31 + 7);
+  ctx.fillStyle = 'rgba(30,26,18,.20)';
+  for (let i = 0; i < 34; i++) {
+    const sx = R() * W, sy = R() * H;
+    ell(sx, sy, 18 + R() * 40, 10 + R() * 24);
+  }
+  // parches de hierba más clara
+  ctx.fillStyle = 'rgba(130,180,110,.06)';
+  for (let i = 0; i < 26; i++) {
+    const sx = R() * W, sy = R() * H;
+    ell(sx, sy, 26 + R() * 46, 14 + R() * 22);
+  }
+  // moteado de luz entre los árboles
+  ctx.fillStyle = 'rgba(180,220,140,.05)';
+  for (let i = 0; i < 14; i++) {
+    const sx = ((i * 137.5 + S.t * 6) % W), sy = ((i * 89.3) % H);
+    ell(sx, sy, 60, 44);
+  }
+}
+
+/* ---------- Objetos del mundo ---------- */
+function dibujarObjeto(o) {
+  const sx = w2sx(o.x), sy = w2sy(o.y);
+  if (sx < -140 || sx > W + 140 || sy < -220 || sy > H + 140) return;
+  const s = o.s || 1;
+  const t = S.t + o.t;
+  if (o.tipo === 'tree' || o.tipo === 'wallTree') {
+    const big = o.tipo === 'wallTree' ? 1.5 : 1;
+    sombra(sx, sy + 4, 30 * s * big, 10 * s * big, .4);
+    ctx.fillStyle = '#6b4f34';
+    ell(sx, sy - 13 * s * big, 7 * s, 18 * s * big);
+    ctx.fillStyle = '#4a3626';
+    ell(sx + 3 * s, sy - 13 * s * big, 4 * s, 18 * s * big);
+    const hz = ['#4f8050', '#427361', '#5c8a4c', '#487146'][Math.floor(o.t * 7) % 4];
+    // sombra interior que da volumen a la copa
+    ctx.fillStyle = 'rgba(0,0,0,.32)';
+    cir(sx - 2 * s, sy - 46 * s * big + 8, 31 * s * big);
+    ctx.fillStyle = shade(hz, -34); cir(sx - 11 * s, sy - 44 * s * big, 21 * s * big);
+    ctx.fillStyle = shade(hz, -34); cir(sx + 13 * s, sy - 46 * s * big, 19 * s * big);
+    ctx.fillStyle = hz; cir(sx + 7 * s, sy - 54 * s * big, 23 * s * big);
+    ctx.fillStyle = shade(hz, 24); cir(sx - 5 * s, sy - 58 * s * big, 18 * s * big);
+    ctx.fillStyle = shade(hz, 48); cir(sx + 5 * s, sy - 63 * s * big, 11 * s * big);
+    ctx.fillStyle = shade(hz, 72); cir(sx + 1 * s, sy - 66 * s * big, 5.5 * s * big);
+    if (Math.sin(t * .7) > .55) { ctx.fillStyle = 'rgba(230,255,200,.65)'; cir(sx + 14 * s, sy - 46 * s, 2.4); }
+  } else if (o.tipo === 'rock') {
+    sombra(sx, sy + 3, 20 * s, 7 * s, .3);
+    ctx.fillStyle = '#5d6167'; ell(sx, sy - 8 * s, 18 * s, 13 * s);
+    ctx.fillStyle = '#767b82'; ell(sx - 4 * s, sy - 13 * s, 11 * s, 7 * s, -.3);
+    ctx.fillStyle = 'rgba(120,180,110,.5)'; ell(sx + 6 * s, sy - 6 * s, 7 * s, 4 * s);
+  } else if (o.tipo === 'bush') {
+    ctx.fillStyle = '#2f4a2a'; cir(sx, sy - 8 * s, 12 * s);
+    ctx.fillStyle = '#3f6135'; cir(sx + 5 * s, sy - 12 * s, 9 * s);
+    ctx.fillStyle = '#547c43'; cir(sx - 4 * s, sy - 13 * s, 7 * s);
+    if (o.t % 1 > .7) { ctx.fillStyle = '#d05a7a'; cir(sx + 3 * s, sy - 15 * s, 2.2); }
+  } else if (o.tipo === 'grass') {
+    ctx.strokeStyle = 'rgba(120,170,90,.75)'; ctx.lineWidth = 2;
+    for (let i = -2; i <= 2; i++) {
+      const sway = Math.sin(t * 1.4 + i) * 3;
+      lne(sx + i * 4 * s, sy, sx + i * 4 * s + sway, sy - (12 + (i % 2) * 7) * s);
+    }
+  } else if (o.tipo === 'ruina') {
+    sombra(sx, sy + 3, 16 * s, 6 * s, .3);
+    ctx.fillStyle = '#5a5a52'; ell(sx, sy - 10 * s, 14 * s, 14 * s);
+    ctx.fillStyle = '#6e6e64'; ell(sx - 3 * s, sy - 17 * s, 9 * s, 7 * s, -.4);
+    ctx.fillStyle = 'rgba(130,170,120,.55)'; ell(sx + 5 * s, sy - 6 * s, 7 * s, 5 * s);
+    ctx.strokeStyle = '#4a4a44'; ctx.lineWidth = 1.5;
+    lne(sx - 6 * s, sy - 14 * s, sx + 4 * s, sy - 8 * s);
+  } else if (o.tipo === 'chest') {
+    sombra(sx, sy + 2, 18, 6, .3);
+    if (o.abierto) {
+      ctx.fillStyle = '#4a3620'; ell(sx, sy - 4, 17, 8);
+      ctx.fillStyle = '#2a1e12'; ell(sx, sy - 9, 15, 5);
+    } else {
+      const brillo = .5 + Math.sin(t * 3) * .3;
+      ctx.fillStyle = '#5b4224'; ell(sx, sy - 8, 17, 10);
+      ctx.fillStyle = '#75562e'; ell(sx, sy - 13, 17, 6);
+      ctx.fillStyle = '#e8c05f'; ell(sx, sy - 8, 3, 5);
+      ctx.fillStyle = 'rgba(255,220,120,' + brillo * .5 + ')'; cir(sx, sy - 22, 4 + brillo * 3);
+    }
+  } else if (o.tipo === 'altar') {
+    sombra(sx, sy + 3, 20, 7, .35);
+    ctx.fillStyle = '#4d4d58'; ell(sx, sy - 6, 18, 10);
+    ctx.fillStyle = '#5f5f6c'; ell(sx, sy - 14, 14, 9);
+    if (!o.usado) {
+      const g = ctx.createRadialGradient(sx, sy - 34, 2, sx, sy - 34, 34);
+      g.addColorStop(0, 'rgba(150,220,255,.85)'); g.addColorStop(1, 'rgba(150,220,255,0)');
+      ctx.fillStyle = g; cir(sx, sy - 34, 34);
+      ctx.fillStyle = '#d8f4ff'; cir(sx, sy - 34, 5 + Math.sin(t * 3) * 1.5);
+      ctx.strokeStyle = 'rgba(150,220,255,.5)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(sx, sy - 34, 12 + Math.sin(t * 2) * 3, 0, TAU); ctx.stroke();
+    } else {
+      ctx.fillStyle = '#3a3a44'; cir(sx, sy - 34, 5);
+    }
+  } else if (o.tipo === 'fuego') {
+    sombra(sx, sy + 2, 20, 7, .35);
+    ctx.fillStyle = '#4a3a26';
+    ell(sx - 9, sy - 3, 9, 5, .4); ell(sx + 9, sy - 3, 9, 5, -.4);
+    if (!o.usado) {
+      const g = ctx.createRadialGradient(sx, sy - 14, 3, sx, sy - 14, 66);
+      g.addColorStop(0, 'rgba(255,180,80,.45)'); g.addColorStop(1, 'rgba(255,150,60,0)');
+      ctx.fillStyle = g; cir(sx, sy - 14, 66);
+      const f = Math.sin(t * 9) * 3;
+      ctx.fillStyle = '#ff8c2a'; ell(sx, sy - 14 + f * .4, 9, 14 + f);
+      ctx.fillStyle = '#ffd76a'; ell(sx, sy - 13, 5, 9 + f * .5);
+      ctx.fillStyle = '#fff2c0'; ell(sx, sy - 12, 2.5, 5);
+    } else {
+      ctx.fillStyle = '#2c2620'; cir(sx, sy - 5, 7);
+    }
+  }
+}
+
+/* ---------- Recogibles ---------- */
+function dibujarPickup(it) {
+  const sx = w2sx(it.x), sy = w2sy(it.y) - Math.sin(it.t * 4) * 4;
+  if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) return;
+  if (it.tipo === 'moneda') {
+    const g = ctx.createRadialGradient(sx, sy, 1, sx, sy, 16);
+    g.addColorStop(0, 'rgba(255,215,110,.55)'); g.addColorStop(1, 'rgba(255,215,110,0)');
+    ctx.fillStyle = g; cir(sx, sy, 16);
+    ctx.fillStyle = '#e8c05f'; ell(sx, sy, 7, 7);
+    ctx.fillStyle = '#fff0b8'; ell(sx - 2, sy - 2, 3, 3);
+  } else if (it.tipo === 'huevo') {
+    const col = ['#c9bda6', '#6fbf5f', '#5fa8e8', '#b06fe8', '#e8c05f'][it.rar];
+    const g = ctx.createRadialGradient(sx, sy - 6, 3, sx, sy - 6, 30);
+    g.addColorStop(0, col.replace(')', ',.5)').replace('rgb', 'rgba'));
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = 'rgba(255,255,255,0)';
+    ctx.save(); ctx.globalAlpha = .35; ctx.fillStyle = col; cir(sx, sy - 6, 26); ctx.restore();
+    ctx.fillStyle = col; ell(sx, sy - 6, 11, 14);
+    ctx.fillStyle = 'rgba(255,255,255,.5)'; ell(sx - 4, sy - 11, 3.5, 5, -.4);
+    ctx.fillStyle = shade(col, -50);
+    for (let i = 0; i < 3; i++) cir(sx - 4 + i * 5, sy - 4 + (i % 2) * 6, 2);
+    ctx.fillStyle = '#fff'; cir(sx, sy - 6 - Math.sin(S.t * 3) * 2, 1.6);
+  } else if (it.tipo === 'equipo') {
+    const col = ['#c9c9c9', '#6fbf5f', '#5fa8e8', '#b06fe8', '#e8c05f'][it.rar];
+    ctx.save(); ctx.translate(sx, sy);
+    const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 26);
+    g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = .4; ctx.fillStyle = g; cir(0, 0, 26); ctx.globalAlpha = 1;
+    ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    if (it.slot === 'weapon') { lne(-8, 8, 10, -10); lne(4, 6, 9, 11); }
+    else if (it.slot === 'armor') { ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(11, -6); ctx.lineTo(8, 10); ctx.lineTo(-8, 10); ctx.lineTo(-11, -6); ctx.closePath(); ctx.stroke(); }
+    else { ctx.beginPath(); ctx.arc(0, 0, 8, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(0, -12, 5, 0, TAU); ctx.stroke(); }
+    ctx.restore();
+  }
+}
+
+/* ---------- Entidades ---------- */
+function dibujarJugador() {
+  const sx = w2sx(P.x), sy = w2sy(P.y);
+  const inv = P.invuln > 0 && Math.floor(S.t * 18) % 2 === 0;
+  sombra(sx, sy + 2, 20, 8, .35);
+  if (P.shield > 0) {
+    ctx.strokeStyle = 'rgba(159,216,255,.75)'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(sx, sy - 20, 30 + Math.sin(S.t * 6) * 2, 0, TAU); ctx.stroke();
+  }
+  if (P.golpeFlash > 0) {
+    ctx.fillStyle = 'rgba(255,90,90,' + (P.golpeFlash * 2) + ')'; cir(sx, sy - 20, 34);
+  }
+  ctx.save();
+  if (inv) ctx.globalAlpha = .45;
+  if (invocUid) {
+    const pet = petDe(invocUid);
+    if (pet) {
+      const d = PETS[pet.id];
+      const paso = P.pasos;
+      dibujarCriatura(d.form, sx, sy, 1.15, d.c1, d.c2, S.t, paso, P.facing, d.r >= 2 ? { ojo: d.r >= 3 ? '#ffd76a' : undefined } : {});
+      if (d.r >= 3) { // aura de rareza alta
+        ctx.globalAlpha = .3 + Math.sin(S.t * 4) * .1;
+        ctx.fillStyle = d.c1; cir(sx, sy - 26, 40);
+        ctx.globalAlpha = inv ? .45 : 1;
+      }
+    }
+  } else if (selUid) {
+    // skin de la mascota seleccionada (aunque aún no esté invocada)
+    const pet = petDe(selUid);
+    if (pet) {
+      const d = PETS[pet.id];
+      dibujarCriatura(d.form, sx, sy, 1.08, d.c1, d.c2, S.t, P.pasos, P.facing, {});
+    } else dibujarCriatura('humano', sx, sy, 1.1, '#4c5a4a', '#2e3830', S.t, P.pasos, P.facing, {});
+  } else {
+    dibujarCriatura('humano', sx, sy, 1.1, '#4c5a4a', '#2e3830', S.t, P.pasos, P.facing, {});
+  }
+  ctx.restore();
+  // indicador de selección (siempre visible bajo la forma activa)
+  const pulso = .65 + Math.sin(S.t * 5) * .2;
+  ctx.strokeStyle = invocUid ? 'rgba(143,216,255,' + pulso + ')' : 'rgba(203,184,120,' + pulso + ')';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.ellipse(sx, sy + 3, 26, 11, 0, 0, TAU); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(sx, sy + 3, 30, 13, 0, 0, TAU); ctx.stroke();
+  // flecha marcadora sobre la cabeza
+  const my = sy - 92;
+  ctx.fillStyle = invocUid ? '#8fd8ff' : '#cbb878';
+  ctx.beginPath(); ctx.moveTo(sx, my + 11); ctx.lineTo(sx - 7, my); ctx.lineTo(sx + 7, my); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 1.2; ctx.stroke();
+  // barra de vida de la forma
+  const mx = statsActivas().maxHp, hp = vidaForma();
+  const bw = 54;
+  ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(sx - bw / 2 - 1, sy - 62, bw + 2, 6);
+  ctx.fillStyle = hp / mx > .35 ? '#5fbf6a' : '#cf5a5a';
+  ctx.fillRect(sx - bw / 2, sy - 61, bw * clamp(hp / mx, 0, 1), 4);
+}
+function dibujarEnemigo(e) {
+  const sx = w2sx(e.x), sy = w2sy(e.y);
+  if (sx < -180 || sx > W + 180 || sy < -240 || sy > H + 160) return;
+  const d = ENEMIGOS[e.id];
+  const flip = P && P.x > e.x ? -1 : 1;
+  const paso = S.t * 8 + e.x * .05;
+  const alpha = e.estado === 'fase' || e.invuln > 0 ? .45 : 1;
+  sombra(sx, sy + 2, 24 * e.esc, 9 * e.esc, .35);
+  if (e.aturdido > 0) {
+    ctx.fillStyle = '#ffd76a';
+    for (let i = 0; i < 3; i++) {
+      const a = S.t * 5 + i * TAU / 3;
+      cir(sx + Math.cos(a) * 16, sy - 66 * e.esc + Math.sin(a) * 5, 3);
+    }
+  }
+  ctx.save();
+  if (alpha < 1) ctx.globalAlpha = alpha;
+  if (e.heridoT > 0) {
+    ctx.fillStyle = 'rgba(255,120,120,.5)'; cir(sx, sy - 26 * e.esc, 34 * e.esc);
+    ctx.globalAlpha = alpha;
+  }
+  const form = e.id === 'guardian' ? 'guardian' : d.form;
+  dibujarCriatura(form, sx, sy, e.esc, d.c1, d.c2, S.t + e.x * .01, paso, flip,
+    { ojo: e.id === 'corrupto' ? '#c07aff' : (e.id === 'espectral' ? '#bff0ff' : undefined) });
+  ctx.restore();
+  if (e.id === 'corrupto') {
+    ctx.globalAlpha = .3 + Math.sin(S.t * 5 + e.x) * .12;
+    ctx.fillStyle = '#9a4ad0'; cir(sx, sy - 30 * e.esc, 36 * e.esc);
+    ctx.globalAlpha = 1;
+  }
+  if (e.id === 'espectral') {
+    ctx.globalAlpha = .22; ctx.fillStyle = '#9fd8ff'; cir(sx, sy - 30 * e.esc, 34 * e.esc);
+    ctx.globalAlpha = 1;
+  }
+  if (e.jefe || e.elite || e.heridoT > 0) {
+    const bw = e.jefe ? 220 : (e.elite ? 90 : 54);
+    const by = sy - (e.jefe ? 150 : 78 * e.esc);
+    ctx.fillStyle = 'rgba(0,0,0,.7)'; ctx.fillRect(sx - bw / 2 - 1, by - 1, bw + 2, 8);
+    ctx.fillStyle = e.jefe ? '#b06fe8' : (e.elite ? '#d08aff' : '#cf5a5a');
+    ctx.fillRect(sx - bw / 2, by, bw * clamp(e.hp / e.maxHp, 0, 1), 6);
+    if (e.jefe || e.elite) {
+      ctx.fillStyle = '#e6dcc0'; ctx.font = '13px Georgia'; ctx.textAlign = 'center';
+      ctx.fillText(d.n, sx, by - 8);
+    }
+  }
+  // aviso de criatura hostil que te persigue
+  if (e.estado === 'perseguir' || e.estado === 'mordisco' || e.estado === 'carga' || e.estado === 'fase') {
+    const ay = sy - (e.jefe ? 178 : (e.elite ? 104 : 94 * e.esc));
+    ctx.fillStyle = '#ff5a5a';
+    ctx.beginPath(); ctx.moveTo(sx, ay + 10); ctx.lineTo(sx - 6, ay); ctx.lineTo(sx + 6, ay); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.75)'; ctx.lineWidth = 1.2; ctx.stroke();
+  }
+}
+function dibujarProys() {
+  for (const p of S.proys) {
+    const sx = w2sx(p.x), sy = w2sy(p.y);
+    const g = ctx.createRadialGradient(sx, sy, 1, sx, sy, p.r * 3);
+    g.addColorStop(0, p.color || '#fff'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; cir(sx, sy, p.r * 3);
+    ctx.fillStyle = '#fff'; cir(sx, sy, p.r * .6);
+  }
+}
+
+/* ---------- Efectos ---------- */
+function dibujarEfectos() {
+  for (const f of S.efectos) {
+    const sx = w2sx(f.x), sy = w2sy(f.y);
+    const k = f.t / (f.dur || .5);
+    ctx.save();
+    if (f.tipo === 'slash') {
+      ctx.globalAlpha = 1 - k;
+      ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 4 - k * 3;
+      ctx.beginPath(); ctx.arc(sx, sy, f.r * (.5 + k * .6), f.ang - .9, f.ang + .9); ctx.stroke();
+    } else if (f.tipo === 'anillo') {
+      ctx.globalAlpha = 1 - k;
+      ctx.strokeStyle = f.color || '#fff'; ctx.lineWidth = 5 * (1 - k) + 1;
+      ctx.beginPath(); ctx.arc(sx, sy, f.r * k, 0, TAU); ctx.stroke();
+    } else if (f.tipo === 'nova') {
+      ctx.globalAlpha = 1 - k;
+      const g = ctx.createRadialGradient(sx, sy, f.r * k * .3, sx, sy, f.r * k);
+      g.addColorStop(0, 'rgba(255,255,255,.5)'); g.addColorStop(.6, f.color || '#8fd8ff'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; cir(sx, sy, f.r * k);
+      ctx.globalAlpha = (1 - k) * .9; ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(sx, sy, f.r * k, 0, TAU); ctx.stroke();
+    } else if (f.tipo === 'impacto') {
+      ctx.globalAlpha = 1 - k; ctx.fillStyle = f.color || '#ffe6a0';
+      for (let i = 0; i < 6; i++) {
+        const a = i * TAU / 6;
+        cir(sx + Math.cos(a) * 22 * k, sy + Math.sin(a) * 22 * k, 3.5 * (1 - k));
+      }
+    } else if (f.tipo === 'sangre') {
+      ctx.globalAlpha = (1 - k) * .8; ctx.fillStyle = f.color || '#8a2b2b';
+      cir(sx, sy - 8, f.r * (.5 + k));
+      for (let i = 0; i < 5; i++) {
+        const a = i * 1.7;
+        cir(sx + Math.cos(a) * f.r * k * 1.6, sy - 10 + Math.sin(a) * f.r * k, 4 * (1 - k));
+      }
+    } else if (f.tipo === 'mordisco') {
+      ctx.globalAlpha = 1 - k; ctx.strokeStyle = '#ff9a9a'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(sx, sy, 20 + k * 26, f.ang - .5, f.ang + .5); ctx.stroke();
+    } else if (f.tipo === 'slam') {
+      const pre = k < .85 ? k / .85 : 1;
+      ctx.globalAlpha = k < .85 ? .5 : (1 - k) * 6;
+      ctx.strokeStyle = f.color || '#b06fe8'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(sx, sy, f.r * pre, 0, TAU); ctx.stroke();
+      if (k >= .85) { ctx.globalAlpha = (1 - k) * 4; ctx.fillStyle = 'rgba(176,111,232,.5)'; cir(sx, sy, f.r); }
+    } else if (f.tipo === 'fantasma' || f.tipo === 'eco') {
+      ctx.globalAlpha = (1 - k) * .5;
+      ctx.fillStyle = f.color || '#9fd8ff';
+      ctx.beginPath(); ctx.ellipse(sx, sy - 20, 26 * (1 + k), 34 * (1 + k), 0, 0, TAU); ctx.fill();
+    } else if (f.tipo === 'niebla') {
+      ctx.globalAlpha = (1 - k) * .8;
+      const g = ctx.createRadialGradient(sx, sy, 2, sx, sy, 30);
+      g.addColorStop(0, '#b06fe8'); g.addColorStop(1, 'rgba(20,4,30,0)');
+      ctx.fillStyle = g; cir(sx, sy, 30 + k * 20);
+    }
+    ctx.restore();
+  }
+  for (const f of S.flotantes) {
+    const sx = w2sx(f.x), sy = w2sy(f.y);
+    ctx.save();
+    ctx.globalAlpha = clamp(1.4 - f.t, 0, 1);
+    ctx.font = (f.grande ? 'bold 20px' : 'bold 14px') + ' Georgia';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.8)';
+    ctx.strokeText(f.txt, sx, sy);
+    ctx.fillStyle = f.color; ctx.fillText(f.txt, sx, sy);
+    ctx.restore();
+  }
+  for (const p of S.proys) { }
+}
+
+/* ---------- NIEBLA DEVORADORA ---------- */
+function dibujarNiebla() {
+  const fy = w2sy(S.fogY);
+  if (fy > H + 80) return;
+  ctx.save();
+  const top = Math.max(0, fy - 30);
+  const g = ctx.createLinearGradient(0, top, 0, H);
+  g.addColorStop(0, 'rgba(12,4,22,0)');
+  g.addColorStop(.12, 'rgba(20,6,34,.72)');
+  g.addColorStop(.5, 'rgba(10,3,18,.94)');
+  g.addColorStop(1, 'rgba(3,1,6,.995)');
+  ctx.fillStyle = g; ctx.fillRect(0, top, W, H - top);
+  // línea ondulante de consumo
+  ctx.strokeStyle = 'rgba(178,110,255,.55)'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += 12) {
+    const y = fy + Math.sin(x * .018 + S.t * 3) * 9 + Math.sin(x * .05 - S.t * 5) * 4;
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(240,200,255,.28)'; ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += 12) {
+    const y = fy - 8 + Math.sin(x * .022 - S.t * 4) * 7;
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  // motas ascendentes
+  ctx.fillStyle = 'rgba(190,140,255,.5)';
+  for (let i = 0; i < 40; i++) {
+    const x = ((i * 97.3) % W);
+    const y = H - ((S.t * 46 + i * 53) % Math.max(40, H - fy));
+    if (y < fy) continue;
+    cir(x, y, 1.4 + (i % 3));
+  }
+  ctx.restore();
+  // aviso si estás en la niebla
+  if (P.y < S.fogY + 30) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(140,60,220,' + (.14 + Math.sin(S.t * 8) * .07) + ')';
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+}
+
+/* ---------- HUD ---------- */
+function barra(x, y, w, h, frac, color, fondo) {
+  ctx.fillStyle = fondo || 'rgba(0,0,0,.65)';
+  ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+  ctx.fillStyle = '#10160f'; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = color; ctx.fillRect(x, y, w * clamp(frac, 0, 1), h);
+}
+function dibujarHUD() {
+  const mx = statsActivas().maxHp, hp = vidaForma();
+  // panel izquierdo: forma activa
+  ctx.save();
+  ctx.fillStyle = 'rgba(8,14,10,.78)'; ctx.fillRect(14, 14, 268, 76);
+  ctx.strokeStyle = '#33483a'; ctx.lineWidth = 1; ctx.strokeRect(14.5, 14.5, 267, 75);
+  ctx.fillStyle = '#cbb878'; ctx.font = '17px Georgia'; ctx.textAlign = 'left';
+  ctx.fillText(iconoForma() + '  ' + nombreForma(), 26, 38);
+  barra(26, 46, 244, 14, hp / mx, hp / mx > .35 ? '#5fbf6a' : '#cf5a5a');
+  ctx.fillStyle = '#e8e2d4'; ctx.font = '11px Georgia'; ctx.textAlign = 'center';
+  ctx.fillText(Math.ceil(hp) + ' / ' + mx, 148, 57);
+  // resistencia
+  barra(26, 66, 244, 8, P.stamina / 100, '#d8c060');
+  ctx.textAlign = 'left'; ctx.fillStyle = '#7d8f7f'; ctx.font = '10px Georgia';
+  ctx.fillText('RESISTENCIA', 26, 86);
+  if (invocUid) {
+    const h = statsHumanos();
+    ctx.textAlign = 'right'; ctx.fillStyle = '#8fa8c0';
+    ctx.fillText('Viajero: ' + Math.ceil(P.hp) + '/' + h.maxHp + ' (oculto)', 276, 86);
+  }
+  ctx.restore();
+
+  // centro superior: región y distancia (centrado entre los paneles lateral)
+  ctx.save();
+  ctx.textAlign = 'center';
+  const mts = S.metaRecorrida || 0;
+  const panelL = 14 + 268 + 12;
+  const panelR = W - 174 - 12;
+  const regW = Math.max(230, Math.min(380, panelR - panelL));
+  const regX = clamp((panelL + panelR) / 2 - regW / 2, 14, W - 14 - regW);
+  ctx.fillStyle = 'rgba(8,14,10,.78)'; ctx.fillRect(regX, 14, regW, 52);
+  ctx.strokeStyle = REGIONES[S.region].color; ctx.strokeRect(regX + .5, 14.5, regW - 1, 51);
+  const regCx = regX + regW / 2;
+  ctx.fillStyle = REGIONES[S.region].color; ctx.font = (regW < 330 ? '12px' : '14px') + ' Georgia';
+  ctx.fillText(REGIONES[S.region].n, regCx, 34);
+  ctx.fillStyle = '#d9e6d5'; ctx.font = '12px Georgia';
+  ctx.fillText(mts + ' m  ·  mejor: ' + save.best + ' m', regCx, 54);
+  // proximidad de la niebla
+  const dyNiebla = P.y - S.fogY;
+  if (dyNiebla < 420) {
+    ctx.fillStyle = dyNiebla < 180 ? '#ff6a6a' : '#c08aff';
+    ctx.font = 'bold 13px Georgia';
+    ctx.fillText(dyNiebla < 180 ? '¡LA NIEBLA ESTÁ ATRÁS TUYO!' : 'La niebla se acerca…', regCx, 84);
+  }
+  ctx.restore();
+
+  // derecha: monedas
+  ctx.save();
+  ctx.fillStyle = 'rgba(8,14,10,.78)'; ctx.fillRect(W - 174, 14, 160, 52);
+  ctx.strokeStyle = '#33483a'; ctx.strokeRect(W - 173.5, 14.5, 159, 51);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#7d8f7f'; ctx.font = '11px Georgia';
+  ctx.fillText('lobos: ' + S.kills + '  ·  huevos: ' + save.eggs.length, W - 28, 56);
+  // moneda dibujada (para no depender de fuentes de emoji)
+  const txtMon = '' + save.coins;
+  ctx.font = '18px Georgia';
+  const twMon = ctx.measureText(txtMon).width;
+  const cxMon = W - 34 - twMon - 18;
+  ctx.textAlign = 'left'; ctx.fillStyle = '#e8c05f';
+  ctx.beginPath(); ctx.arc(cxMon, 32, 8.5, 0, TAU); ctx.fill();
+  ctx.strokeStyle = '#a8842e'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#fff0b8'; ctx.beginPath(); ctx.arc(cxMon - 2.5, 29.5, 3, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#e8c05f'; ctx.fillText(txtMon, cxMon + 16, 38);
+  ctx.restore();
+
+  // barra del jefe
+  if (S.boss && !S.boss.muerto) {
+    const b = S.boss;
+    ctx.save();
+    ctx.fillStyle = 'rgba(8,6,12,.85)'; ctx.fillRect(W / 2 - 240, H - 118, 480, 34);
+    ctx.strokeStyle = '#b06fe8'; ctx.strokeRect(W / 2 - 239.5, H - 117.5, 479, 33);
+    barra(W / 2 - 230, H - 108, 460, 16, b.hp / b.maxHp, '#b06fe8');
+    ctx.fillStyle = '#e6dcc0'; ctx.font = '13px Georgia'; ctx.textAlign = 'center';
+    ctx.fillText('EL DEVORADOR', W / 2, H - 90);
+    ctx.restore();
+  }
+
+  // barra rápida de mascotas (1-2-3)
+  ctx.save();
+  const vivas = save.pets.slice(0, 3);
+  let bx = 14, by = H - 78;
+  if (vivas.length) {
+    ctx.fillStyle = 'rgba(8,14,10,.78)'; ctx.fillRect(bx, by, vivas.length * 138 + 8, 64);
+    ctx.strokeStyle = '#33483a'; ctx.strokeRect(bx + .5, by + .5, vivas.length * 138 + 7, 63);
+    vivas.forEach((pet, i) => {
+      const d = PETS[pet.id];
+      const x = bx + 8 + i * 138;
+      const activa = selUid === pet.uid, invocada = invocUid === pet.uid;
+      ctx.fillStyle = invocada ? 'rgba(60,110,140,.5)' : (activa ? 'rgba(50,80,55,.6)' : 'rgba(20,30,22,.6)');
+      ctx.fillRect(x, by + 8, 130, 48);
+      ctx.strokeStyle = invocada ? '#8fd8ff' : (activa ? '#7fb086' : '#2b3f2f');
+      ctx.lineWidth = invocada || activa ? 2 : 1;
+      ctx.strokeRect(x + .5, by + 8.5, 129, 47);
+      const hp = petHp[pet.uid] !== undefined ? petHp[pet.uid] : 0;
+      const mhp = statsMascota(pet).maxHp;
+      ctx.fillStyle = '#e6dcc0'; ctx.font = '12px Georgia'; ctx.textAlign = 'left';
+      ctx.fillText((i + 1) + ' ' + (ICONO_PET[d.form] || '') + ' ' + d.n.slice(0, 13), x + 6, by + 26);
+      barra(x + 6, by + 34, 118, 8, hp / mhp, hp / mhp > .35 ? '#5fbf6a' : '#cf5a5a');
+      ctx.fillStyle = '#7d8f7f'; ctx.font = '9px Georgia';
+      ctx.fillText(invocada ? 'INVOCADA' : (activa ? 'SELECCIONADA' : ''), x + 6, by + 53);
+    });
+  }
+  // ayuda rápida
+  ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(190,205,190,.7)'; ctx.font = '11px Georgia';
+  const ayuda = invocUid ? 'E: retirar mascota · Q: especial · I: inventario' : (selUid ? 'E: invocar mascota · Q: sin especial · I: inventario' : 'I: inventario · ataca con clic');
+  ctx.fillText(ayuda, W - 16, H - 20);
+  if (P.espCd > 0 && invocUid) {
+    ctx.fillStyle = '#8fa8c0';
+    ctx.fillText('especial: ' + P.espCd.toFixed(1) + 's', W - 16, H - 40);
+  }
+  ctx.restore();
+
+  // notificaciones
+  ctx.save();
+  ctx.textAlign = 'right';
+  S.notif.forEach((n, i) => {
+    const a = clamp(4 - n.t, 0, 1);
+    ctx.globalAlpha = a;
+    ctx.font = '14px Georgia';
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.85)';
+    ctx.strokeText(n.txt, W - 20, 110 + i * 22);
+    ctx.fillStyle = n.color; ctx.fillText(n.txt, W - 20, 110 + i * 22);
+  });
+  ctx.restore();
+
+  // aviso de invocación peligrosa
+  if (S.invocPend) {
+    const pet = petDe(S.invocPend);
+    if (pet) {
+      const d = PETS[pet.id];
+      const hp = petHp[pet.uid] || 0, mhp = statsMascota(pet).maxHp;
+      ctx.save();
+      const bw = 480, bx = W / 2 - bw / 2, by = H / 2 + 90;
+      ctx.fillStyle = 'rgba(40,10,10,.92)'; ctx.fillRect(bx, by, bw, 92);
+      ctx.strokeStyle = '#c06060'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, bw, 92);
+      ctx.textAlign = 'center'; ctx.fillStyle = '#ffb0b0'; ctx.font = 'bold 16px Georgia';
+      ctx.fillText('⚠ ADVERTENCIA DE INVOCACIÓN', W / 2, by + 26);
+      ctx.fillStyle = '#e8d8d8'; ctx.font = '14px Georgia';
+      ctx.fillText(d.n + ' está herido (' + Math.ceil(hp) + '/' + mhp + ')', W / 2, by + 50);
+      ctx.fillStyle = '#ff8a8a'; ctx.font = '13px Georgia';
+      ctx.fillText('Si muere en combate, morirá PARA SIEMPRE  ·  E: invocar  ·  Esc: cancelar', W / 2, by + 74);
+      // cuenta atrás
+      ctx.fillStyle = 'rgba(255,120,120,.7)'; ctx.fillRect(bx, by + 88, bw * (S.invocAvisoT / 4), 4);
+      ctx.restore();
+    }
+  }
+
+  // banner de región / eventos
+  if (S.banner) {
+    const b = S.banner;
+    const a = b.t0 < .4 ? b.t0 / .4 : (b.t0 > 2.6 ? clamp(3.4 - b.t0, 0, 1) / .8 : 1);
+    ctx.save(); ctx.globalAlpha = a;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(4,8,6,.75)'; ctx.fillRect(0, H / 2 - 96, W, 92);
+    ctx.fillStyle = '#cbb878'; ctx.font = '30px Georgia';
+    ctx.fillText(b.t, W / 2, H / 2 - 50);
+    ctx.fillStyle = '#9fb3a2'; ctx.font = '15px Georgia';
+    ctx.fillText(b.s, W / 2, H / 2 - 22);
+    ctx.strokeStyle = 'rgba(203,184,120,.5)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W / 2 - 220, H / 2 - 12); ctx.lineTo(W / 2 + 220, H / 2 - 12); ctx.stroke();
+    ctx.restore();
+  }
+
+  // fragmento de historia leído
+  if (S.lectura) {
+    const l = S.lectura;
+    l.t += 1 / 60;
+    const a = l.t < .3 ? l.t / .3 : (l.t > 6 ? clamp(7 - l.t, 0, 1) : 1);
+    if (a <= 0) { S.lectura = null; }
+    else {
+      ctx.save(); ctx.globalAlpha = a;
+      const bw = Math.min(640, W - 60), bx = W / 2 - bw / 2, by = H - 210;
+      ctx.fillStyle = 'rgba(6,12,9,.94)'; ctx.fillRect(bx, by, bw, 132);
+      ctx.strokeStyle = '#3f5c42'; ctx.strokeRect(bx + .5, by + .5, bw - 1, 131);
+      ctx.fillStyle = '#cbb878'; ctx.font = '13px Georgia'; ctx.textAlign = 'center';
+      ctx.fillText('📜 ' + l.f.t, W / 2, by + 26);
+      ctx.fillStyle = '#a9b3a5'; ctx.font = 'italic 14px Georgia';
+      wrapTexto(l.f.x, W / 2, by + 52, bw - 60, 20);
+      ctx.restore();
+    }
+  }
+}
+function wrapTexto(txt, cx, y, maxW, lh) {
+  const palabras = txt.split(' ');
+  let linea = '', yy = y;
+  for (const p of palabras) {
+    const test = linea ? linea + ' ' + p : p;
+    if (ctx.measureText(test).width > maxW && linea) {
+      ctx.fillText(linea, cx, yy); yy += lh; linea = p;
+    } else linea = test;
+  }
+  if (linea) ctx.fillText(linea, cx, yy);
+}
+
+/* ---------- Dibujo principal ---------- */
+function dibujar() {
+  ctx.clearRect(0, 0, W, H);
+  dibujarSuelo();
+
+  // recogibles y objetos + entidades ordenados por profundidad
+  const items = [];
+  const ciIni = Math.floor((S.cam.y - 1000) / CFG.chunkH);
+  const ciFin = Math.floor((S.cam.y + 1500) / CFG.chunkH);
+  for (let ci = ciIni; ci <= ciFin; ci++) {
+    const ch = S.chunks.get(ci); if (!ch) continue;
+    for (const o of ch.objetos) if (o.y > S.fogY - 40) items.push(o);
+  }
+  for (const it of S.pickups) if (it.y > S.fogY - 40) items.push(it);
+  for (const e of S.enemies) if (!e.muerto && e.y > S.fogY - 40) items.push(e);
+  if (P) items.push({ tipo: '__jugador', y: P.y, ref: P });
+  items.sort((a, b) => b.y - a.y);
+  for (const it of items) {
+    if (it.tipo === '__jugador') dibujarJugador();
+    else if (it.tipo === 'tree' || it.tipo === 'wallTree' || it.tipo === 'rock' || it.tipo === 'bush' ||
+      it.tipo === 'grass' || it.tipo === 'ruina' || it.tipo === 'chest' || it.tipo === 'altar' || it.tipo === 'fuego') dibujarObjeto(it);
+    else if (it.tipo === 'moneda' || it.tipo === 'huevo' || it.tipo === 'equipo') dibujarPickup(it);
+    else if (it.hp !== undefined && it.id) dibujarEnemigo(it);
+  }
+  dibujarProys();
+  dibujarEfectos();
+  dibujarNiebla();
+  if (S.estado === 'jugando' || S.estado === 'fin') dibujarHUD();
+
+  // viñeta
+  const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .72);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.55)');
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+}
+
+/* ---------- Interacciones con el mundo ---------- */
+function actualizarObjetos(dt) {
+  const ci = Math.floor(P.y / CFG.chunkH);
+  for (let c = ci - 1; c <= ci + 1; c++) {
+    const ch = S.chunks.get(c); if (!ch) continue;
+    for (const o of ch.objetos) {
+      const d2 = dist2(o.x, o.y, P.x, P.y);
+      if (o.tipo === 'chest' && !o.abierto && d2 < 52 * 52) {
+        o.abierto = true;
+        const reg = regionIdx(metros(o.y));
+        const cant = Math.round(rnd(18, 46) * (1 + reg * .7));
+        save.coins += cant;
+        flotante(o.x, o.y - 30, '+' + cant + ' 🪙', '#e8c05f', true);
+        sfx.botin();
+        if (Math.random() < .42) {
+          const slot = pick(['weapon', 'armor', 'amulet']);
+          const rar = clamp(Math.floor(Math.random() * (1.6 + reg * 1.1)), 0, 4);
+          S.pickups.push({ tipo: 'equipo', x: o.x + rnd(-30, 30), y: o.y + rnd(-30, 30), vx: rnd(-60, 60), vy: rnd(80, 150), t: 0, slot, rar });
+        }
+        if (Math.random() < .14) {
+          const rar = pesoHuevo(reg);
+          S.pickups.push({ tipo: 'huevo', x: o.x + rnd(-30, 30), y: o.y + rnd(-30, 30), vx: rnd(-60, 60), vy: rnd(80, 150), t: 0, rar });
+          notif('¡El cofre contenía un huevo!', '#8fd8ff');
+        }
+        efecto('impacto', o.x, o.y - 10, { dur: .4, color: '#e8c05f' });
+        persist();
+      } else if (o.tipo === 'altar' && !o.usado && d2 < 62 * 62) {
+        o.usado = true;
+        let idx = ri(0, FRAGMENTOS.length - 1);
+        for (let i = 0; i < FRAGMENTOS.length; i++) {
+          if (!save.fragments.includes(i)) { idx = i; break; }
+        }
+        if (!save.fragments.includes(idx)) save.fragments.push(idx);
+        S.lectura = { f: FRAGMENTOS[idx], t: 0 };
+        efecto('anillo', o.x, o.y, { dur: 1.4, color: '#9fd8ff', r: 140 });
+        sfx.curar();
+        persist();
+      } else if (o.tipo === 'fuego' && !o.usado && d2 < 74 * 74) {
+        o.usado = true;
+        const cur = statsActivas().maxHp * .4;
+        sanarForma(cur);
+        flotante(P.x, P.y - 30, '+' + Math.round(cur), '#7fffa8', true);
+        // las demás mascotas descansan también
+        save.pets.forEach(p => {
+          if (p.uid === invocUid) return;
+          const m = statsMascota(p).maxHp;
+          petHp[p.uid] = Math.min(m, (petHp[p.uid] !== undefined ? petHp[p.uid] : m) + m * .2);
+        });
+        efecto('anillo', o.x, o.y, { dur: 1.2, color: '#ffb060', r: 110 });
+        notif('Descansas junto al fuego: +40% vida, tus mascotas +20%', '#ffb060');
+        sfx.curar();
+      }
+    }
+  }
+}
+
+/* ============================================================
+   INTERFAZ (HTML)
+   ============================================================ */
+const $ = id => document.getElementById(id);
+function ocultarTodas() {
+  ['capaTitulo', 'capaMascotas', 'capaInventario', 'capaFin', 'capaFinal'].forEach(id => $(id).classList.add('oculto'));
+  $('botonesJuego').classList.add('oculto'); // botones flotantes: solo durante la partida
+  _bjCache = '';
+}
+function mostrarTitulo() {
+  ocultarTodas();
+  $('capaTitulo').classList.remove('oculto');
+  S.estado = 'titulo';
+  $('tituloStats').innerHTML =
+    '<div class="stat"><b>' + save.best + ' m</b><span>Mayor avance</span></div>' +
+    '<div class="stat"><b>' + save.runs + '</b><span>Aventuras</span></div>' +
+    '<div class="stat"><b>' + save.pets.length + '</b><span>Mascotas vivas</span></div>' +
+    '<div class="stat"><b>' + save.lost + '</b><span>Mascotas perdidas</span></div>' +
+    '<div class="stat"><b>' + save.fragments.length + '/' + FRAGMENTOS.length + '</b><span>Fragmentos</span></div>' +
+    '<div class="stat"><b>🪙 ' + save.coins + '</b><span>Monedas</span></div>';
+  $('btnSonido').textContent = 'Sonido: ' + (save.muted ? 'silenciado' : 'activado');
+  renderTienda();
+  persist();
+}
+function renderTienda() {
+  const defs = [
+    { k: 'hp', n: 'Resistencia del viajero', d: '+15 vida máxima', base: 60 },
+    { k: 'atk', n: 'Filo del viajero', d: '+2 ataque', base: 70 },
+    { k: 'spd', n: 'Zapatillas del bosque', d: '+8 velocidad', base: 50 }
+  ];
+  $('tienda').innerHTML = defs.map(d => {
+    const lvl = save.upgrades[d.k];
+    const costo = d.base * (lvl + 1);
+    const max = lvl >= 5;
+    return '<div class="mejora"><div class="n">' + d.n + '</div>' +
+      '<div class="lvl">Nivel ' + lvl + ' / 5</div>' +
+      '<div class="d" style="color:#7d8f7f;margin:4px 0">' + d.d + '</div>' +
+      '<button class="btn chico" data-up="' + d.k + '" ' + (max || save.coins < costo ? 'disabled' : '') + '>' +
+      (max ? 'Máximo' : '🪙 ' + costo) + '</button></div>';
+  }).join('');
+  $('tienda').querySelectorAll('[data-up]').forEach(b => b.onclick = () => {
+    const k = b.dataset.up, lvl = save.upgrades[k];
+    const base = { hp: 60, atk: 70, spd: 50 }[k];
+    const costo = base * (lvl + 1);
+    if (lvl >= 5 || save.coins < costo) return;
+    save.coins -= costo; save.upgrades[k]++;
+    snd(520, .1, 'sine', .05, 200);
+    renderTienda(); mostrarTitulo();
+  });
+}
+function opcionesMascota() {
+  const vivas = save.pets.filter(p => petDe(p.uid));
+  if (vivas.length) return { lista: vivas, rescatar: false };
+  if (save.eggs.length === 0 && save.pets.length === 0) {
+    return { lista: ['lobo_plata', 'oso_piedra', 'zorro_arcano'].map(id => ({ uid: 'starter_' + id, id, starter: true })), rescatar: true };
+  }
+  return { lista: [], rescatar: false };
+}
+function mostrarSeleccion() {
+  ocultarTodas();
+  $('capaMascotas').classList.remove('oculto');
+  S.estado = 'seleccion';
+  const op = opcionesMascota();
+  const cont = $('listaMascotasInicio');
+  if (!op.lista.length) {
+    cont.innerHTML = '<div class="vacio" style="flex:1">No te queda ninguna mascota viva… y el refugio ya no puede ofrecerte un nuevo vínculo.<br><br>' +
+      'Podrás encontrar huevos derrotando lobos: 1% de probabilidad en cada criatura.</div>';
+    $('btnSinMascota').textContent = 'Salir solo al bosque';
+    return;
+  }
+  $('btnSinMascota').textContent = 'Salir sin mascota (solo humano)';
+  cont.innerHTML = op.lista.map((p, i) => {
+    const d = PETS[p.id];
+    const stats = p.starter ? { maxHp: d.hp, atk: d.atk, spd: d.spd } : statsMascota(p);
+    const hp = p.starter ? d.hp : (petHp[p.uid] !== undefined ? petHp[p.uid] : stats.maxHp);
+    return '<div class="tarjeta" data-i="' + i + '">' +
+      '<div class="centrado"><span class="raridad r' + d.r + '">' + RAREZAS[d.r] + '</span></div>' +
+      '<div class="icono">' + (ICONO_PET[d.form] || '🐾') + '</div>' +
+      '<h3>' + d.n + '</h3>' +
+      '<div class="fila"><span>Vida</span><span>' + Math.ceil(hp) + ' / ' + stats.maxHp + '</span></div>' +
+      '<div class="barrita"><i style="width:' + Math.round(hp / stats.maxHp * 100) + '%"></i></div>' +
+      '<div class="fila"><span>Ataque</span><span>' + stats.atk + '</span></div>' +
+      '<div class="fila"><span>Velocidad</span><span>' + stats.spd + '</span></div>' +
+      '<div class="fila"><span>Especial</span><span>' + d.esp.n + '</span></div>' +
+      '<div class="desc">' + d.esp.d + '</div>' +
+      '</div>';
+  }).join('');
+  cont.querySelectorAll('.tarjeta').forEach(c => c.onclick = () => {
+    const p = op.lista[+c.dataset.i];
+    if (p.starter) {
+      const uid = nuevoUid();
+      save.pets.push({ uid, id: p.id });
+      petHp[uid] = PETS[p.id].hp;
+      persist();
+    } else if (petHp[p.uid] === undefined) {
+      petHp[p.uid] = statsMascota(p).maxHp;
+    }
+    selUid = p.uid;
+    S.selElegido = p.uid;
+    iniciarPartida();
+  });
+}
+function iniciarPartida() {
+  nuevaPartida();
+  ocultarTodas(); // el panel de selección debe desaparecer: el juego ya va detrás
+  if (S.selElegido && petDe(S.selElegido)) { selUid = S.selElegido; S.selElegido = null; }
+  if (selUid && petHp[selUid] === undefined) {
+    const pet = petDe(selUid); if (pet) petHp[selUid] = statsMascota(pet).maxHp;
+  }
+}
+
+/* ---------- Inventario ---------- */
+let pestanaAct = 'mascotas';
+function abrirInventario() {
+  if (S.estado !== 'jugando') return;
+  S.pausa = true;
+  $('capaInventario').classList.remove('oculto');
+  renderInv();
+}
+function cerrarInventario() {
+  $('capaInventario').classList.add('oculto');
+  S.pausa = false;
+}
+function renderInv() {
+  $('invMonedas').textContent = save.coins;
+  document.querySelectorAll('.pestana').forEach(p => p.classList.toggle('on', p.dataset.p === pestanaAct));
+  const c = $('invCuerpo');
+  if (pestanaAct === 'mascotas') {
+    if (!save.pets.length) {
+      c.innerHTML = '<div class="vacio">No tienes ninguna mascota.<br>Derrota lobos para conseguir huevos: 1% de probabilidad por criatura.</div>';
+      return;
+    }
+    c.innerHTML = '<div class="lista">' + save.pets.map(p => {
+      const d = PETS[p.id];
+      const st = statsMascota(p);
+      const hp = petHp[p.uid] !== undefined ? petHp[p.uid] : st.maxHp;
+      const estado = invocUid === p.uid ? 'INVOCADA' : (selUid === p.uid ? 'Seleccionada' : 'Disponible');
+      const color = invocUid === p.uid ? '#8fd8ff' : '#7fb086';
+      return '<div class="item"><div class="ico">' + (ICONO_PET[d.form] || '🐾') + '</div>' +
+        '<div><div class="n">' + d.n + ' <span class="raridad r' + d.r + '" style="margin:0 0 0 6px">' + RAREZAS[d.r] + '</span></div>' +
+        '<div class="d">Vida ' + Math.ceil(hp) + '/' + st.maxHp + ' · Ataque ' + st.atk + ' · Vel. ' + st.spd + ' · ' + d.esp.n + '</div>' +
+        '<div class="barrita" style="width:230px"><i style="width:' + Math.round(hp / st.maxHp * 100) + '%"></i></div></div>' +
+        '<div class="der"><span style="color:' + color + ';font-size:11px">' + estado + '</span>' +
+        '<button class="btn chico" data-sel="' + p.uid + '">' + (invocUid === p.uid ? 'Activa' : 'Seleccionar') + '</button></div></div>';
+    }).join('') + '</div>' +
+      '<div class="aviso" style="background:rgba(30,40,30,.5);border-color:#3f5c42;color:#9fb3a2">' +
+      'Regla de muerte permanente: si la mascota invocada muere en combate, desaparece de esta lista para siempre.</div>';
+    c.querySelectorAll('[data-sel]').forEach(b => b.onclick = () => {
+      selUid = b.dataset.sel;
+      if (invocUid && invocUid !== selUid) retirarMascota();
+      renderInv();
+    });
+  } else if (pestanaAct === 'objetos') {
+    const ranuras = ['weapon', 'armor', 'amulet'].map(k => {
+      const g = save.equipped[k];
+      return '<div class="ranura"><div class="t">' + GEAR_TIPO[k] + '</div>' +
+        (g ? '<div class="n" style="color:#e6dcc0;margin:4px 0">' + g.nombre + '</div>' +
+          '<div style="color:#7fb086">' + describirEquipo(g) + '</div>' +
+          '<div class="raridad r' + g.rar + '" style="margin-top:4px">' + RAREZAS[g.rar] + '</div>' +
+          '<button class="btn chico" data-sol="' + k + '">Quitar</button>'
+          : '<div style="color:#5e6f61;font-style:italic;margin-top:4px">vacía</div>') + '</div>';
+    }).join('');
+    const huevos = save.eggs.map((e, i) =>
+      '<div class="item"><div class="ico">' + (ICONO_HUEVO[e.rar] || '🥚') + '</div>' +
+      '<div><div class="n">Huevo ' + RAREZAS[e.rar] + '</div>' +
+      '<div class="d">Contenido desconocido · incubar para descubrirlo</div></div>' +
+      '<div class="der"><button class="btn chico" data-inc="' + i + '">Incubar</button></div></div>').join('');
+    const bolsa = save.gear.map((g, i) =>
+      '<div class="item"><div class="ico">' + (g.slot === 'weapon' ? '🗡️' : g.slot === 'armor' ? '🛡️' : '📿') + '</div>' +
+      '<div><div class="n">' + g.nombre + ' <span class="raridad r' + g.rar + '" style="margin:0 0 0 6px">' + RAREZAS[g.rar] + '</span></div>' +
+      '<div class="d">' + describirEquipo(g) + ' · ' + GEAR_TIPO[g.slot] + '</div></div>' +
+      '<div class="der"><button class="btn chico" data-eq="' + i + '">Equipar</button>' +
+      '<button class="btn chico peligro" data-del="' + i + '">Descartar</button></div></div>').join('');
+    c.innerHTML =
+      '<div class="grid3" style="margin-bottom:14px">' + ranuras + '</div>' +
+      '<h2>Huevos (' + save.eggs.length + ')</h2><div class="lista">' +
+      (huevos || '<div class="vacio">Sin huevos. Cada lobo derrotado tiene 1% de probabilidad de soltar uno.</div>') + '</div>' +
+      '<div class="sep"></div><h2>Bolsa (' + save.gear.length + ')</h2><div class="lista">' +
+      (bolsa || '<div class="vacio">Sin equipo guardado. Los cofres y enemigos de las regiones profundas sueltan equipo con más frecuencia.</div>') + '</div>';
+    c.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => incubar(+b.dataset.inc));
+    c.querySelectorAll('[data-eq]').forEach(b => b.onclick = () => equipar(+b.dataset.eq));
+    c.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+      save.gear.splice(+b.dataset.del, 1); persist(); renderInv();
+    });
+    c.querySelectorAll('[data-sol]').forEach(b => b.onclick = () => {
+      const k = b.dataset.sol, g = save.equipped[k];
+      if (g) { save.gear.push(g); save.equipped[k] = null; aplicarStatsForma(); persist(); renderInv(); }
+    });
+  } else {
+    const frags = save.fragments.length
+      ? save.fragments.map(i => '<div class="frag"><span class="tit-frag">📜 ' + FRAGMENTOS[i].t + '</span><br>' + FRAGMENTOS[i].x + '</div>').join('')
+      : '<div class="vacio">Aún no has descubierto ningún fragmento. Busca los altares brillantes del bosque.</div>';
+    const perdidas = save.lostNames.length
+      ? '<div class="sep"></div><h2>In memoriam</h2><div class="aviso">Estas mascotas muerieron para siempre en tus manos:<br><br>' +
+        save.lostNames.map(n => '· ' + n).join('<br>') + '</div>'
+      : '';
+    c.innerHTML = frags + perdidas;
+  }
+}
+function incubar(i) {
+  const e = save.eggs[i]; if (!e) return;
+  const pool = HUEVOS[e.rar];
+  const id = pool[Math.floor(Math.random() * pool.length)];
+  const uid = nuevoUid();
+  save.pets.push({ uid, id });
+  petHp[uid] = PETS[id].hp;
+  save.eggs.splice(i, 1);
+  persist();
+  sfx.huevo();
+  notif('¡Ha eclosionado: ' + PETS[id].n + '!', '#e8c05f');
+  renderInv();
+}
+function equipar(i) {
+  const g = save.gear[i]; if (!g) return;
+  const act = save.equipped[g.slot];
+  save.equipped[g.slot] = g;
+  save.gear.splice(i, 1);
+  if (act) save.gear.push(act);
+  aplicarStatsForma();
+  sfx.botin();
+  persist(); renderInv();
+}
+
+/* ---------- Final de partida ---------- */
+function mostrarFin(vic) {
+  ocultarTodas();
+  const perdidas = Math.max(0, save.lost - (S.perdidasIni || 0));
+  $('finTitulo').textContent = vic ? 'Has sobrevivido' : 'La niebla te ha alcanzado';
+  $('finSub').textContent = vic ? '' : 'El bosque se llevó lo que llevabas encima';
+  $('finTexto').innerHTML = vic
+    ? 'El mundo deja de desaparecer a tu espalda.'
+    : 'No miraste atrás, pero la oscuridad llegó igual. Tus mascotas vivas siguen en el refugio; las que murieron, murieron para siempre.';
+  $('finStats').innerHTML =
+    '<div class="stat"><b>' + (S.metaRecorrida || 0) + ' m</b><span>Distancia</span></div>' +
+    '<div class="stat"><b>' + save.best + ' m</b><span>Récord</span></div>' +
+    '<div class="stat"><b>' + S.kills + '</b><span>Enemigos</span></div>' +
+    '<div class="stat"><b>' + perdidas + '</b><span>Mascotas perdidas</span></div>' +
+    '<div class="stat"><b>🪙 ' + save.coins + '</b><span>Monedas totales</span></div>';
+  $('capaFin').classList.remove('oculto');
+}
+function victoria() {
+  S.estado = 'victoria';
+  save.best = Math.max(save.best, S.metaRecorrida || 0);
+  persist();
+  ocultarTodas();
+  $('capaFinal').classList.remove('oculto');
+  $('finalOpciones').classList.remove('oculto');
+  $('finalCierre').classList.add('oculto');
+  $('finalBtn').classList.add('oculto');
+  sfx.region();
+}
+function cerrarFinal(i) {
+  $('finalOpciones').classList.add('oculto');
+  $('finalCierre').innerHTML = '<div class="sep"></div>' + CIERRES[i] +
+    '<br><br><span style="color:#7d8f7f;font-size:13px">Fin de la leyenda · avance máximo: ' +
+    (S.metaRecorrida || 0) + ' m · enemigos: ' + S.kills + ' · fragmentos: ' +
+    save.fragments.length + '/' + FRAGMENTOS.length + '</span>';
+  $('finalCierre').classList.remove('oculto');
+  $('finalBtn').classList.remove('oculto');
+}
+
+/* ============================================================
+   ENTRADA
+   ============================================================ */
+window.addEventListener('keydown', ev => {
+  const k = ev.key.toLowerCase();
+  if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) ev.preventDefault();
+  if (!S.keys[k]) {
+    // pulsaciones
+    if (k === 'e') {
+      if (S.estado === 'jugando' && !S.pausa) {
+        if (S.invocPend) { invocar(S.invocPend); S.invocPend = 0; }
+        else pedirInvocar();
+      }
+    } else if (k === 'i') {
+      if (S.pausa) cerrarInventario(); else abrirInventario();
+    } else if (k === 'escape') {
+      if (S.invocPend) S.invocPend = 0;
+      else if (S.pausa) cerrarInventario();
+      else if (S.estado === 'jugando') abrirInventario();
+    } else if (k === 'm') {
+      save.muted = !save.muted; persist();
+      const b = $('btnSonido'); if (b) b.textContent = 'Sonido: ' + (save.muted ? 'silenciado' : 'activado');
+      notif(save.muted ? 'Sonido silenciado' : 'Sonido activado', '#9fb3a2');
+    } else if (k >= '1' && k <= '3') {
+      if (S.estado === 'jugando' && !S.pausa) {
+        const p = save.pets[+k - 1];
+        if (p) {
+          if (invocUid === p.uid) { retirarMascota(); }
+          else { selUid = p.uid; notif('Seleccionada: ' + PETS[p.id].n, '#7fb086'); }
+        }
+      }
+    }
+  }
+  S.keys[k] = true;
+});
+window.addEventListener('keyup', ev => { S.keys[ev.key.toLowerCase()] = false; });
+window.addEventListener('blur', () => { S.keys = {}; S.mouse.down = false; S.mouse.rdown = false; });
+cv.addEventListener('mousemove', ev => {
+  const r = cv.getBoundingClientRect();
+  const ex = (r.width > 0) ? cv.width / r.width : 1;
+  const ey = (r.height > 0) ? cv.height / r.height : 1;
+  S.mouse.x = (ev.clientX - r.left) * ex;
+  S.mouse.y = (ev.clientY - r.top) * ey;
+});
+cv.addEventListener('mousedown', ev => {
+  if (ev.button === 0) S.mouse.down = true;
+  if (ev.button === 2) S.mouse.rdown = true;
+  if (!AC && !save.muted) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } }
+});
+window.addEventListener('mouseup', ev => {
+  if (ev.button === 0) S.mouse.down = false;
+  if (ev.button === 2) S.mouse.rdown = false;
+});
+cv.addEventListener('contextmenu', ev => ev.preventDefault());
+
+/* ---------- Botones ---------- */
+$('btnAventura').onclick = () => { snd(440, .1, 'triangle', .05, 100); mostrarSeleccion(); };
+$('btnControles').onclick = () => $('panelControles').classList.toggle('oculto');
+$('btnSonido').onclick = () => {
+  save.muted = !save.muted; persist();
+  $('btnSonido').textContent = 'Sonido: ' + (save.muted ? 'silenciado' : 'activado');
+  if (!save.muted) snd(600, .1, 'sine', .05, 200);
+};
+$('btnSinMascota').onclick = () => { selUid = null; iniciarPartida(); };
+$('btnInvJuego').onclick = () => {
+  if (S.pausa) cerrarInventario(); else abrirInventario();
+  refrescarBotonesJuego();
+};
+$('btnPetJuego').onclick = () => {
+  if (S.estado !== 'jugando' || S.pausa) return;
+  if (S.invocPend) { invocar(S.invocPend); S.invocPend = 0; }
+  else pedirInvocar();
+  refrescarBotonesJuego();
+};
+/* Botones flotantes: visibilidad y etiquetas según el estado de la partida */
+let _bjCache = '';
+function refrescarBotonesJuego() {
+  const bj = $('botonesJuego'); if (!bj) return;
+  const jugando = S.estado === 'jugando';
+  bj.classList.toggle('oculto', !jugando);
+  if (!jugando) { _bjCache = ''; return; }
+  const pet = selUid ? petDe(selUid) : null;
+  const invocada = !!(pet && invocUid === pet.uid);
+  const etiqueta = (S.invocPend ? 'confirmar' : (invocada ? 'retirar' : (pet ? 'invocar' : 'ninguna'))) + '|' +
+    (pet ? PETS[pet.id].n : '-') + '|' + (S.pausa ? 'inv' : '');
+  if (etiqueta === _bjCache) return;
+  _bjCache = etiqueta;
+  const bp = $('btnPetJuego');
+  if (S.invocPend) { bp.textContent = '⚠ Confirmar invocación'; bp.classList.add('activo'); bp.disabled = false; }
+  else if (invocada) { bp.textContent = '🐾 Retirar ' + PETS[pet.id].n; bp.classList.add('activo'); bp.disabled = false; }
+  else if (pet) { bp.textContent = '🐾 Invocar ' + PETS[pet.id].n; bp.classList.remove('activo'); bp.disabled = false; }
+  else { bp.textContent = '🐾 Sin mascota'; bp.classList.remove('activo'); bp.disabled = true; }
+  $('btnInvJuego').textContent = S.pausa ? '✖ Cerrar inventario' : '🎒 Inventario';
+}
+$('btnCerrarInv').onclick = cerrarInventario;
+document.querySelectorAll('.pestana').forEach(p => p.onclick = () => { pestanaAct = p.dataset.p; renderInv(); });
+$('btnReintentar').onclick = () => { mostrarSeleccion(); };
+$('btnMenu').onclick = () => mostrarTitulo();
+$('btnFinMenu').onclick = () => mostrarTitulo();
+document.querySelectorAll('#finalOpciones [data-fin]').forEach(b => b.onclick = () => cerrarFinal(+b.dataset.fin));
+
+/* ============================================================
+   BUCLE PRINCIPAL
+   Motor con respaldo: si el navegador bloquea requestAnimationFrame
+   (ventanas minimizadas, visores embebidos), el juego sigue con un
+   temporizador sin duplicar la velocidad.
+   ============================================================ */
+/* Resolución fija del juego (ratio 5:4) y escalado a la ventana */
+const RES_W = 1280, RES_H = 1024;
+function redimensionar() {
+  W = cv.width = RES_W;
+  H = cv.height = RES_H;
+  const escala = Math.min(window.innerWidth / RES_W, window.innerHeight / RES_H);
+  cv.style.width = Math.round(RES_W * escala) + 'px';
+  cv.style.height = Math.round(RES_H * escala) + 'px';
+  // botones flotantes pegados al borde derecho del canvas (bajo el panel de monedas)
+  const r = cv.getBoundingClientRect();
+  const bj = $('botonesJuego');
+  if (bj) {
+    bj.style.right = Math.round(window.innerWidth - r.right + 10) + 'px';
+    bj.style.top = Math.round(r.top + 88) + 'px';
+  }
+}
+window.addEventListener('resize', redimensionar);
+
+function fondoTitulo(dt) {
+  ctx.fillStyle = '#0a1210'; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#0d1a14'); g.addColorStop(.6, '#0a1210'); g.addColorStop(1, '#05080a');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // niebla baja animada
+  ctx.fillStyle = 'rgba(90,40,150,.16)';
+  for (let i = 0; i < 5; i++) {
+    const y = H - 40 - i * 34 + Math.sin(S.t * .7 + i) * 8;
+    ctx.beginPath(); ctx.ellipse(W / 2, y, W * .7, 44, 0, 0, TAU); ctx.fill();
+  }
+  // siluetas de árboles
+  const R = mulberry32(7);
+  for (let i = 0; i < 34; i++) {
+    const x = R() * W, base = H * (.55 + R() * .45), s = .6 + R() * 1.3;
+    ctx.fillStyle = 'rgba(6,14,10,' + (.55 + s * .2) + ')';
+    ctx.fillRect(x - 4 * s, base - 60 * s, 8 * s, 62 * s);
+    ctx.beginPath();
+    ctx.moveTo(x, base - 150 * s); ctx.lineTo(x + 42 * s, base - 40 * s); ctx.lineTo(x - 42 * s, base - 40 * s);
+    ctx.closePath(); ctx.fill();
+  }
+  // motas
+  ctx.fillStyle = 'rgba(180,255,200,.35)';
+  for (let i = 0; i < 40; i++) {
+    const x = (i * 127.7 + Math.sin(S.t * .5 + i) * 30) % W;
+    const y = (H - ((S.t * 18 + i * 61) % H));
+    cir(x, y, 1.4);
+  }
+}
+
+let ultimoPaso = 0, rafReciente = false;
+function pasoJuego() {
+  const ahora = performance.now();
+  if (ahora - ultimoPaso < 8) return;   // evita dobles cadenas / pasos duplicados
+  const dt = Math.min(.05, (ahora - ultimoPaso) / 1000 || .016);
+  ultimoPaso = ahora;
+  S.t += dt;
+  if (S.estado === 'jugando') {
+    actualizar(dt);
+    refrescarBotonesJuego();
+    // cámara
+    S.cam.x = lerp(S.cam.x, P.x, 1 - Math.pow(.001, dt));
+    S.cam.y = lerp(S.cam.y, P.y + 150, 1 - Math.pow(.002, dt));
+    dibujar();
+  } else if (S.estado === 'fin' || S.estado === 'victoria') {
+    if (P) { S.cam.x = lerp(S.cam.x, P.x, .1); S.cam.y = lerp(S.cam.y, P.y + 150, .1); dibujar(); }
+    else fondoTitulo(dt);
+  } else {
+    fondoTitulo(dt);
+  }
+}
+function bucle() {
+  rafReciente = true;
+  pasoJuego();
+  requestAnimationFrame(bucle);
+}
+setInterval(() => {
+  if (!rafReciente) pasoJuego();
+  rafReciente = false;
+}, 60);
+
+/* ---------- Arranque ---------- */
+loadSave();
+redimensionar();
+mostrarTitulo();
+requestAnimationFrame(bucle);
+
+</script>
+</body>
+</html>

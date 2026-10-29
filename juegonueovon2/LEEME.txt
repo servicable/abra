@@ -1,0 +1,76 @@
+ECOS DEL BOSQUE ETERNO
+======================
+
+Juego de rol de supervivencia: el mundo desaparece a tus espaldas mientras
+avanzas por un bosque generado de forma infinita, lleno de lobos, huevos
+mágicos y mascotas que puedes perder PARA SIEMPRE.
+
+-----------------------------------------------
+CÓMO JUGAR (Windows)
+-----------------------------------------------
+1. Haz doble clic en  JUGAR.bat
+   (o abre directamente Ecos_del_Bosque_Eterno.html con Edge/Chrome/Firefox)
+
+2. Pulsa "Comenzar la aventura" y elige tu primer compañero.
+
+3. ¡CORRE HACIA ARRIBA! La niebla negra de abajo nunca deja de avanzar.
+   Si te alcanza, pierdes vida. Detenerte es morir.
+
+No necesita instalación, ni Internet, ni Python. Todo va en un solo archivo
+y tu progreso se guarda solo en tu navegador.
+
+-----------------------------------------------
+CONTROLES
+-----------------------------------------------
+W A S D o Flechas .... moverse manualmente
+Shift ................ correr (gasta resistencia)
+Clic izquierdo / Espacio  atacar
+Clic derecho / Q ..... habilidad especial de la mascota invocada
+1 2 3 ................ seleccionar mascota (tu personaje cambia de skin)
+E .................... invocar mascota (¡te conviertes en ella!) / retirarla
+I .................... inventario (mascotas, objetos, huevos, historia)
+Esc .................. abrir/cerrar inventario · cancelar aviso de invocación
+M .................... silenciar sonido
+
+BOTONES EN PANTALLA (esquina superior derecha, durante la partida)
+* 🎒 Inventario ...... abre o cierra el inventario (igual que la tecla I)
+* 🐾 Mascota ......... invoca o retira tu mascota (igual que la tecla E);
+                       muestra el nombre de la mascota seleccionada.
+
+-----------------------------------------------
+REGLAS DEL JUEGO
+-----------------------------------------------
+* MUERTE PERMANENTE: si la mascota que tienes invocada muere, desaparece
+  de tu colección para siempre. No hay resurrección.
+* Antes de invocar una mascota herida o estando rodeado de enemigos verás
+  una advertencia de 4 segundos (E para confirmar, Esc para cancelar).
+* LOBOS: 1% de probabilidad de soltar un HUEVO y 50% de soltar EQUIPO o
+  MONEDAS. Los dos cálculos son independientes: pueden salir a la vez.
+* HUEVOS: se inciuban desde el inventario (pestaña Objetos) y contienen
+  mascotas de 5 rarezas: común, poco común, raro, épico y legendario.
+* EQUIPO: armas, armaduras y amuletos. Se equipa solo si es mejor que el
+  que llevas; el resto va a la bolsa.
+* EL MUNDO: se genera por delante mientras caminas y la niebla consume el
+  terreno de atrás. No se puede volver atrás.
+* REGIONES: I Bosque Despierto (0 m) · II Bosque Corrompido (350 m) ·
+  III Ruinas de los Guardianes (800 m) · IV El Fin de la Niebla (1400 m).
+  A los 1800 m aparece EL DEVORADOR: derrotarlo termina la leyenda.
+* Refugio del viajero: en el menú principal gastas monedas para mejorar
+  tu forma humana (vida, ataque, velocidad). Las monedas son persistentes.
+
+-----------------------------------------------
+CONSEJOS
+-----------------------------------------------
+- Las hogueras curan tu vida un 40% y a tus mascotas un 20%.
+- Los altares azules dan fragmentos de la historia (pestaña Historia).
+- Guarda una mascota sana en reserva: la invocada es la que puede morir.
+- El Zorro Arcano ataca a distancia; el Oso aguanta; el Lobo esquiva y
+  embiste. Combínalos según el peligro.
+
+-----------------------------------------------
+SOLUCIÓN DE PROBLEMAS
+-----------------------------------------------
+- Si el juego no abre: ábrelo con clic derecho > Abrir con > Edge/Chrome.
+- Si no hay sonido: pulsa M en el juego o el botón del menú.
+- Tu progreso se guarda en el navegador (localStorage). Si quieres
+  empezar de cero, borra los datos del sitio del juego en tu navegador.
